@@ -1,21 +1,34 @@
-# Zone 9 Explorer v4
+# Zone 9 Explorer v5
 
-Standalone browser map explorer for `zone9.glb`. This is a separate project and does not modify StandoffX.
+Standalone first-person map explorer. It is a separate project and does not modify StandoffX.
+
+## Maps
+The start screen lets you choose **Zone 9** or **Province**, then press **Play**. Put these files in the repository root for automatic loading:
+- `zone9.glb`
+- `province.glb`
+
+If the files are not hosted next to the HTML page, the file picker can load a GLB from your device manually.
 
 ## Controls
-- WASD / arrow keys: move
-- Mouse: look around
-- Space: jump
-- Shift: run
-- N or the Noclip button: toggle flying through walls
-- In Noclip: Space rises, Ctrl descends
-- G: hide/show the control panel
-- X/Y/Z numeric fields and sliders: teleport/set coordinates
-- The panel also includes player-size and movement-speed sliders
+- `W A S D` / arrow keys — move
+- Mouse — look around
+- `Space` — jump; in Noclip, fly up
+- `Shift` — run
+- `N` or the Noclip button — toggle flying through walls
+- In Noclip, `Ctrl` — fly down
+- `G` — show/hide player panel
+- X/Y/Z can be set by typing coordinates or using the sliders
+- Panel includes player-size and movement-speed sliders
 
 ## GitHub Pages
-The Pages entry point is `index.html`, which opens `zone9_explorer.html`. For automatic map loading, put `zone9.glb` at the repository root next to both HTML files. If it is absent, use the file picker shown by the page.
+The repository includes `index.html`, `zone9_explorer.html`, and `.nojekyll`. To publish: repository **Settings → Pages → Deploy from a branch → main → /(root) → Save**.
 
-To publish: repository **Settings → Pages → Deploy from a branch → main → /(root) → Save**. Expected site URL: https://standoffX.github.io/zone9prototype/.
+Expected URL: https://standoffX.github.io/zone9prototype/
 
-Note: the GLB asset is not stored in this commit; add your local `zone9.glb` file to the repository root and commit it separately. The file is about 54 MB, so use git from your computer instead of the small-file editor if GitHub's web uploader rejects it.
+## Add the map files
+The two GLB models are large binary files (about 54 MB and 65 MB). They have not been uploaded to GitHub by the text-file integration used to update this repository. Add both files to the repository root with GitHub Desktop or Git:
+1. Clone `https://github.com/standoffX/zone9prototype.git`
+2. Copy `zone9.glb` and `province.glb` into the cloned folder
+3. Commit and push the two files
+
+The app will try to load each map from `./zone9.glb` or `./province.glb` depending on your choice.
