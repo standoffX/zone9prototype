@@ -1,34 +1,33 @@
-# Zone 9 Explorer v5
+# Zone 9 Explorer v6
 
-Standalone first-person map explorer. It is a separate project and does not modify StandoffX.
+Standalone first-person map explorer for Zone 9. This is a separate project and does not modify StandoffX.
 
-## Maps
-The start screen lets you choose **Zone 9** or **Province**, then press **Play**. Put these files in the repository root for automatic loading:
-- `zone9.glb`
-- `province.glb`
-
-If the files are not hosted next to the HTML page, the file picker can load a GLB from your device manually.
+## Map status
+- **Zone 9** is the only selectable map for now.
+- The supplied `province.glb` currently has detached building geometry and missing ground sections in the inspected preview. It is intentionally removed from the playable map selector until it can be rebuilt. The original asset is not deleted from the user's local files.
 
 ## Controls
-- `W A S D` / arrow keys — move
-- Mouse — look around
-- `Space` — jump; in Noclip, fly up
-- `Shift` — run
-- `N` or the Noclip button — toggle flying through walls
-- In Noclip, `Ctrl` — fly down
-- `G` — show/hide player panel
-- X/Y/Z can be set by typing coordinates or using the sliders
-- Panel includes player-size and movement-speed sliders
+- WASD / arrow keys: walk
+- Mouse: look around
+- Space: jump
+- Shift: run
+- N or the Noclip button: fly through walls; Space/Ctrl up/down
+- Left mouse: knife slash
+- Right mouse: quick thrust
+- F: inspect knife
+- G: show/hide settings
+- X/Y/Z coordinates: numeric fields and sliders
+- Settings also include player-size and movement-speed sliders
+
+## Knife
+The page uses an original procedural first-person tactical knife and custom idle sway, slash, thrust, and inspect animations inspired by FPS handling. No game-extracted Standoff 2 model or animation files are bundled. For visual/motion reference, a community video shows the Standoff 2 knife animations: https://rutube.ru/video/0dc8057b3cd015eaa124bf3afc2f9bab/
 
 ## GitHub Pages
-The repository includes `index.html`, `zone9_explorer.html`, and `.nojekyll`. To publish: repository **Settings → Pages → Deploy from a branch → main → /(root) → Save**.
+Keep `index.html`, `zone9_explorer.html`, and `zone9.glb` in the repository root. Enable Pages from `main` / root in **Settings → Pages**.
 
-Expected URL: https://standoffX.github.io/zone9prototype/
+Expected URL: https://standoffx.github.io/zone9prototype/
 
-## Add the map files
-The two GLB models are large binary files (about 54 MB and 65 MB). They have not been uploaded to GitHub by the text-file integration used to update this repository. Add both files to the repository root with GitHub Desktop or Git:
-1. Clone `https://github.com/standoffX/zone9prototype.git`
-2. Copy `zone9.glb` and `province.glb` into the cloned folder
-3. Commit and push the two files
+## Publish the map binary
+The GitHub app integration used for code changes cannot upload the binary GLB directly. The Explorer v6 ZIP includes `Publish_Zone9_To_GitHub_Windows.bat` and `Publish_Zone9_To_GitHub_Mac.command`. Run the script from the extracted folder to clone the repository, copy the optimized `zone9.glb` and updated HTML, then commit and push. Authenticate with GitHub if prompted.
 
-The app will try to load each map from `./zone9.glb` or `./province.glb` depending on your choice.
+The provided Zone 9 GLB was optimized for web delivery by converting opaque color textures to JPEG while preserving the transparent decal and mesh geometry (approximately 56 MB → 17 MB).
