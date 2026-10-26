@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Zone 9 Explorer v2 — Map Scale & Spawn Fix</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+:root{color-scheme:dark;--bg:rgba(12,16,23,.88);--line:rgba(190,210,230,.16);--text:#eef4fa;--muted:#9aa9ba;--blue:#48a5ff;--blue2:#1678d3}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1017;color:var(--text);font-family:Nunito,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}canvas{display:block;width:100%;height:100%;outline:none}
+#view{position:fixed;inset:0}#hud{position:fixed;top:14px;left:14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(460px,calc(100vw - 28px))}.hud-chip{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;backdrop-filter:blur(12px);box-shadow:0 5px 25px #0002}.fps-line{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;letter-spacing:.5px}.dot{width:8px;height:8px;background:#62e6a7;border-radius:50%;box-shadow:0 0 12px #62e6a788}.fps-number{font-size:19px;line-height:1;color:#fff;font-variant-numeric:tabular-nums}.hint{font-size:12px;color:#b6c2d0;line-height:1.55}.key{border:1px solid #65728388;background:#242e3b;border-radius:4px;padding:1px 5px;color:#f2f7fb;font-weight:800}
+#panel{position:fixed;right:14px;top:14px;width:264px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;backdrop-filter:blur(16px);box-shadow:0 12px 36px #0004;transition:opacity .15s,transform .15s;z-index:5}#panel.hidden{display:none}.panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.panel-title{font-size:13px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase}.panel-tag{font-size:10px;color:#a9cfff;background:#1b4061;border:1px solid #2e5d83;border-radius:5px;padding:3px 6px;font-weight:900}.coords{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.field{min-width:0}.field label,.size-row label{display:block;font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.8px;margin:0 0 5px 2px}.field input{width:100%;min-width:0;background:#0a0f16;border:1px solid #354252;border-radius:8px;color:#f2f7fb;padding:9px 6px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;outline:none}.field input:focus,.field input:hover{border-color:#4e9fe8}.panel-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.btn{border:1px solid #3b4859;background:#202a37;color:#eaf3fd;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:850;cursor:pointer}.btn:hover{background:#2b3a4d}.btn.primary{background:var(--blue2);border-color:#348fe0;color:white}.btn.primary:hover{background:#278ce8}.size-row{margin-top:15px}.size-head{display:flex;align-items:center;justify-content:space-between}.size-value{font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;color:#dceeff}input[type=range]{width:100%;margin:10px 0 2px;accent-color:var(--blue);cursor:pointer}.size-range-labels{display:flex;justify-content:space-between;color:#8493a5;font-size:10px}.panel-foot{border-top:1px solid var(--line);margin-top:13px;padding-top:10px;color:#8f9eaf;font-size:10px;line-height:1.5}#showPanel{display:none;position:fixed;right:14px;top:14px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:#eef4fa;font-size:12px;font-weight:900;cursor:pointer;z-index:6;backdrop-filter:blur(12px)}#showPanel.visible{display:block}
+#loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1b2a3b 0%,#0b1017 65%);z-index:10;padding:20px}#loader.off{display:none}.load-card{width:min(440px,100%);padding:26px;background:rgba(14,20,29,.95);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 24px 80px #0008}.brand{font-size:11px;font-weight:900;letter-spacing:2.4px;color:#7bbcff}.load-title{font-size:28px;font-weight:900;letter-spacing:-.8px;margin:9px 0 7px}.load-desc{font-size:13px;color:#aab7c6;line-height:1.65;margin-bottom:20px}.file-button{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;padding:13px 15px;background:var(--blue2);border:1px solid #64b0fa;color:white;font-size:13px;font-weight:900;border-radius:10px;cursor:pointer}.file-button:hover{background:#278ce8}.file-button:disabled{opacity:.6;cursor:wait}#fileInput{display:none}#status{font-size:12px;color:#9eaec0;min-height:18px;margin-top:12px;line-height:1.5}.load-help{font-size:11px;color:#8190a2;margin-top:16px;line-height:1.6;border-top:1px solid var(--line);padding-top:13px}#error{color:#ff9b9b}#crosshair{position:fixed;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);pointer-events:none;display:none;opacity:.7}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}.locked #crosshair{display:block}#crosshair:before{width:10px;height:1px;left:0;top:4px}#crosshair:after{height:10px;width:1px;left:4px;top:0}
+@media(max-width:560px){#panel{right:8px;top:8px;width:242px;padding:11px}#hud{top:8px;left:8px;gap:6px}.hud-chip{padding:8px 10px}#showPanel{right:8px;top:8px}.load-title{font-size:24px}}
+</style>
+</head>
+<body>
+<div id="view"></div>
+<div id="hud">
+  <div class="hud-chip"><div class="fps-line"><span class="dot"></span><span class="fps-number" id="fps">--</span><span>FPS</span><span style="margin-left:auto;color:#8293a5;font-size:10px;font-weight:800" id="quality">WEBGL</span></div></div>
+  <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SHIFT</span> швидше<br><span class="key">МИША</span> огляд &nbsp; <span class="key">G</span> панель &nbsp; <span class="key">ESC</span> курсор</div>
+</div>
+<div id="panel">
+  <div class="panel-top"><div class="panel-title">Параметри гравця</div><div class="panel-tag">ZONE 9</div></div>
+  <form id="coordsForm">
+    <div class="coords">
+      <div class="field"><label for="posX">X</label><input id="posX" type="number" step="0.1" value="0" /></div>
+      <div class="field"><label for="posY">Y / ВИСОТА</label><input id="posY" type="number" step="0.1" value="0" /></div>
+      <div class="field"><label for="posZ">Z</label><input id="posZ" type="number" step="0.1" value="0" /></div>
+    </div>
+    <div class="panel-buttons"><button class="btn primary" type="submit">Застосувати</button><button class="btn" type="button" id="groundBtn">На поверхню</button><button class="btn" type="button" id="spawnBtn">На спавн</button></div>
+  </form>
+  <div class="size-row"><div class="size-head"><label for="sizeRange">РОЗМІР ПЕРСОНАЖА</label><span class="size-value" id="sizeValue">1.00×</span></div><input id="sizeRange" type="range" min="0.50" max="2.00" step="0.05" value="1.00"/><div class="size-range-labels"><span>Менший</span><span>Більший</span></div></div>
+  <div class="panel-foot">Координати можна змінювати вручну. «На поверхню» шукає землю під гравцем, «На спавн» повертає у стартову точку. Розмір змінює висоту огляду й радіус колізій.</div>
+</div>
+<button id="showPanel" type="button">ПАРАМЕТРИ · G</button>
+<div id="crosshair"></div>
+<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Окремий переглядач твоєї GLB-карти. Масштаб zone9.glb автоматично виправляється, а стартова точка шукається по поверхні карти.</div><button class="file-button" id="chooseBtn" type="button"><span>＋</span> Вибрати zone9.glb</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Вибери файл <b>zone9.glb</b> зі свого пристрою.</div><div class="load-help">Керування: WASD — ходьба, миша — огляд, Shift — біг, G — показати/сховати координати. Esc — звільнити курсор.</div></div></div>
+<script type="module">
+const $ = id => document.getElementById(id);
+let THREE, GLTFLoader, PointerLockControls;
+// Dynamic imports let the page show a readable error instead of a blank screen
+// if the browser cannot resolve Three.js or the CDN is temporarily unavailable.
+try {
+  const modules = await Promise.all([
+    import('three'),
+    import('three/addons/loaders/GLTFLoader.js'),
+    import('three/addons/controls/PointerLockControls.js')
+  ]);
+  THREE = modules[0];
+  GLTFLoader = modules[1].GLTFLoader;
+  PointerLockControls = modules[2].PointerLockControls;
+} catch (err) {
+  const status = $('status');
+  if (status) status.innerHTML = '<span id="error">Не вдалося завантажити Three.js з CDN. Перевір інтернет і відкрий HTML через Start_Zone9_Windows.bat / Start_Zone9_Mac.command. Деталі є в консолі браузера.</span>';
+  console.error('[Zone 9] Three.js import failed:', err);
+  throw err;
+}
+const view = $('view'), loaderScreen = $('loader'), statusEl = $('status');
+let scene, camera, renderer, controls, mapRoot, mapScaleRoot, mapBounds = new THREE.Box3();
+let spawnPoint = null, mapScaleFactor = 1;
+let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
+const keys = new Set();
+const raycaster = new THREE.Raycaster();
+const down = new THREE.Vector3(0,-1,0);
+const worldNormalMatrix = new THREE.Matrix3();
+const BASE_EYE_HEIGHT = 1.65, BASE_RADIUS = 0.30;
+const AUTO_FIX_TINY_GLB_SCALE = 100;
+const WALK_SPEED = 4.2, RUN_SPEED = 7.0, STEP_UP = 0.42, MAX_DROP = 1.65;
+
+function init(){
+  scene = new THREE.Scene(); scene.background = new THREE.Color(0x9da8b4);
+  camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.05, 2000);
+  renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance', alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.0));
+  renderer.setSize(innerWidth, innerHeight); renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  view.appendChild(renderer.domElement);
+  controls = new PointerLockControls(camera, renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6c7480, 2.0));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.0); sun.position.set(80,140,60); scene.add(sun);
+  mapRoot = new THREE.Group(); scene.add(mapRoot);
+  controls.addEventListener('lock', () => document.body.classList.add('locked'));
+  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); });
+  renderer.domElement.addEventListener('click', () => { if(hasMap && !controls.isLocked && !isUiFocused()) controls.lock(); });
+  window.addEventListener('resize', onResize);
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('keyup', e => keys.delete(e.code));
+  window.addEventListener('blur', () => keys.clear());
+  $('chooseBtn').addEventListener('click', () => $('fileInput').click());
+  $('fileInput').addEventListener('change', e => { const file=e.target.files?.[0]; if(file) loadMap(file); e.target.value=''; });
+  // A browser cannot reliably read a sibling file when the HTML is opened with file://.
+  // On localhost/HTTP we can load zone9.glb automatically from this HTML's folder.
+  if (location.protocol === 'http:' || location.protocol === 'https:') {
+    setStatus('Автоматично шукаю zone9.glb у цій самій папці…');
+    loadMapFromUrl('./zone9.glb');
+  } else {
+    setStatus('Відкрий цю сторінку кнопкою Start_Zone9_Windows.bat / Start_Zone9_Mac.command для авто-завантаження. Або вибери zone9.glb вручну нижче.');
+  }
+  $('coordsForm').addEventListener('submit', e => { e.preventDefault(); applyCoordinates(); });
+  $('groundBtn').addEventListener('click', dropToSurface);
+  $('spawnBtn').addEventListener('click', returnToSpawn);
+  $('sizeRange').addEventListener('input', e => {
+    playerScale = Number(e.target.value); $('sizeValue').textContent = playerScale.toFixed(2)+'×';
+    if(hasMap) camera.position.y = floorY + eyeHeight();
+    refreshCoordFields(true);
+  });
+  $('showPanel').addEventListener('click', togglePanel);
+  animate();
+}
+function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
+function onKeyDown(e){
+  if(e.code==='KeyG' && !e.repeat && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){ e.preventDefault(); togglePanel(); return; }
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)) keys.add(e.code);
+  if(e.code.startsWith('Arrow') && controls?.isLocked) e.preventDefault();
+}
+function togglePanel(){ $('panel').classList.toggle('hidden'); $('showPanel').classList.toggle('visible', $('panel').classList.contains('hidden')); }
+function onResize(){ if(!camera||!renderer)return; camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.0)); }
+function setStatus(text, error=false){ statusEl.innerHTML = error ? '<span id="error">'+text+'</span>' : text; }
+function loadMap(file){
+  if(!file.name.toLowerCase().endsWith('.glb')){ setStatus('Вибери файл саме у форматі .glb', true); return; }
+  const url = URL.createObjectURL(file);
+  loadMapSource(url, file.name, true);
+}
+function loadMapFromUrl(url){
+  loadMapSource(url, 'zone9.glb', false);
+}
+function loadMapSource(url, displayName, revokeUrl){
+  $('chooseBtn').disabled = true;
+  setStatus('Завантаження '+escapeHtml(displayName)+'…');
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load(url, gltf => {
+    try{
+      mapRoot.clear();
+      const model = gltf.scene; model.name='Zone9Map';
+      // The uploaded zone9.glb has a root-node scale of 0.01. Without
+      // cancelling that exported scale the full map is only a few units wide.
+      model.updateMatrixWorld(true);
+      const rawBounds = new THREE.Box3().setFromObject(model);
+      const rawSize = new THREE.Vector3(); rawBounds.getSize(rawSize);
+      const rawLongestSide = Math.max(rawSize.x, rawSize.y, rawSize.z);
+      mapScaleFactor = rawLongestSide > 0 && rawLongestSide < 10 ? AUTO_FIX_TINY_GLB_SCALE : 1;
+      mapScaleRoot = new THREE.Group();
+      mapScaleRoot.name = 'Zone9AutoScale';
+      mapScaleRoot.scale.setScalar(mapScaleFactor);
+      mapScaleRoot.add(model);
+      mapRoot.add(mapScaleRoot);
+      model.traverse(o=>{
+        if(o.isMesh){
+          o.castShadow=false; o.receiveShadow=false; o.frustumCulled=true;
+          if(o.material){
+            const mats=Array.isArray(o.material)?o.material:[o.material];
+            for(const m of mats){
+              if(m.map) m.map.anisotropy=Math.min(2,renderer.capabilities.getMaxAnisotropy());
+              // Some exported surfaces have reversed winding; double-side
+              // keeps them visible and makes floor-ray tests reliable.
+              m.side = THREE.DoubleSide; m.needsUpdate = true;
+            }
+          }
+        }
+      });
+      mapRoot.updateMatrixWorld(true); mapBounds.setFromObject(mapRoot);
+      if(mapBounds.isEmpty() || !Number.isFinite(mapBounds.min.y)) throw new Error('У файлі не знайдено геометрію карти.');
+      const spawn = findSpawn(); floorY=spawn.y; spawnPoint = new THREE.Vector3(spawn.x, spawn.y, spawn.z);
+      camera.position.set(spawn.x, floorY+eyeHeight(), spawn.z);
+      const center = mapBounds.getCenter(new THREE.Vector3());
+      const dx = center.x - spawn.x, dz = center.z - spawn.z;
+      const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
+      camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
+      hasMap=true; loaderScreen.classList.add('off'); refreshCoordFields(true);
+      $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
+      console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
+    }catch(err){
+      console.error(err);
+      setStatus('Не вдалося підготувати карту: '+escapeHtml(err.message||String(err)),true);
+      $('chooseBtn').disabled=false;
+    }finally{
+      if(revokeUrl) URL.revokeObjectURL(url);
+    }
+  }, evt => {
+    if(evt.total) setStatus('Завантаження карти… '+Math.round(evt.loaded/evt.total*100)+'%');
+  }, err => {
+    console.warn('Не вдалося автоматично завантажити '+displayName+':', err);
+    if(revokeUrl) URL.revokeObjectURL(url);
+    $('chooseBtn').disabled=false;
+    if(!revokeUrl && location.protocol === 'file:') {
+      setStatus('Браузер не дозволив відкрити сусідній файл напряму. Запусти локальний сервер або натисни «Вибрати zone9.glb».',true);
+    } else {
+      setStatus('Не вдалося завантажити '+escapeHtml(displayName)+'. Перевір, що zone9.glb лежить у тій самій папці з HTML, або вибери файл кнопкою нижче.',true);
+    }
+  });
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function eyeHeight(){ return BASE_EYE_HEIGHT*playerScale; }
+function radius(){ return BASE_RADIUS*playerScale; }
+function normalY(hit){
+  if(!hit.face) return 1;
+  worldNormalMatrix.getNormalMatrix(hit.object.matrixWorld);
+  return hit.face.normal.clone().applyMatrix3(worldNormalMatrix).normalize().y;
+}
+function findFloorAt(x,z,originY,far){
+  raycaster.set(new THREE.Vector3(x,originY,z),down); raycaster.near=0; raycaster.far=far;
+  const hits=raycaster.intersectObject(mapRoot,true);
+  for(const h of hits){ if(Math.abs(normalY(h))>0.48) return h.point.y; }
+  return null;
+}
+function findSpawn(){
+  const size = new THREE.Vector3(); mapBounds.getSize(size);
+  const center = new THREE.Vector3(); mapBounds.getCenter(center);
+  const origin = mapBounds.max.y + Math.max(20, size.y * 0.25);
+  const far = Math.max(300, size.y + Math.max(30, size.y * 0.25) + 50);
+  const candidates = [];
+  // Sample a grid across the map. Picking the lowest commonly reachable
+  // floor-level surfaces avoids spawning on the roof of the central building.
+  const divisions = 8;
+  for(let ix=1; ix<divisions; ix++){
+    const x = mapBounds.min.x + size.x * ix / divisions;
+    for(let iz=1; iz<divisions; iz++){
+      const z = mapBounds.min.z + size.z * iz / divisions;
+      const y = findFloorAt(x,z,origin,far);
+      if(y !== null && Number.isFinite(y)) candidates.push({x,y,z});
+    }
+  }
+  // Always include the exact center as a candidate too.
+  const centerY = findFloorAt(center.x,center.z,origin,far);
+  if(centerY !== null && Number.isFinite(centerY)) candidates.push({x:center.x,y:centerY,z:center.z});
+  if(!candidates.length) return {x:center.x,y:mapBounds.min.y+0.1,z:center.z};
+  const lowestY = Math.min(...candidates.map(p=>p.y));
+  const floorBand = Math.max(2.5, size.y * 0.07);
+  const lowSurfaces = candidates.filter(p=>p.y <= lowestY + floorBand);
+  lowSurfaces.sort((a,b)=>{
+    const da=(a.x-center.x)**2+(a.z-center.z)**2;
+    const db=(b.x-center.x)**2+(b.z-center.z)**2;
+    return da-db;
+  });
+  const best = lowSurfaces[0] || candidates[0];
+  return {x:best.x, y:best.y+0.035, z:best.z};
+}
+function wallBlocked(fromX,fromZ,toX,toZ,feet,dist){
+  if(dist<0.0001)return false;
+  const dx=toX-fromX,dz=toZ-fromZ,dir=new THREE.Vector3(dx,0,dz).normalize();
+  const origin=new THREE.Vector3(fromX,feet+Math.min(0.8*playerScale,eyeHeight()*.55),fromZ);
+  raycaster.set(origin,dir); raycaster.near=0.03; raycaster.far=dist+radius();
+  const hits=raycaster.intersectObject(mapRoot,true);
+  for(const h of hits){
+    const ny=normalY(h);
+    if(Math.abs(ny)<0.45 && h.distance < dist+radius() && h.distance>0.035) return true;
+  }
+  return false;
+}
+function tryMoveTo(x,z,fromX,fromZ,dist){
+  if(wallBlocked(fromX,fromZ,x,z,floorY,dist)) return false;
+  const y=findFloorAt(x,z,floorY+STEP_UP*playerScale+0.08,(STEP_UP+MAX_DROP)*playerScale);
+  if(y===null) return false;
+  if(y>floorY+STEP_UP*playerScale || y<floorY-MAX_DROP*playerScale) return false;
+  floorY=y+0.015; camera.position.set(x,floorY+eyeHeight(),z); return true;
+}
+function movePlayer(dt){
+  if(!controls.isLocked || !hasMap) return;
+  let f=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0);
+  let r=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);
+  if(!f&&!r)return;
+  const forward=new THREE.Vector3(); camera.getWorldDirection(forward); forward.y=0; forward.normalize();
+  const right=new THREE.Vector3(-forward.z,0,forward.x);
+  const dir=forward.multiplyScalar(f).add(right.multiplyScalar(r)).normalize();
+  const speed=(keys.has('ShiftLeft')||keys.has('ShiftRight'))?RUN_SPEED:WALK_SPEED;
+  const dx=dir.x*speed*dt, dz=dir.z*speed*dt;
+  if(Math.abs(dx)<1e-8&&Math.abs(dz)<1e-8)return;
+  const x=camera.position.x,z=camera.position.z;
+  const dist=Math.hypot(dx,dz);
+  if(!tryMoveTo(x+dx,z+dz,x,z,dist)){
+    // Axis-separated fallback lets the player slide alongside walls.
+    if(Math.abs(dx)>1e-5) tryMoveTo(x+dx,z,x,z,Math.abs(dx));
+    const x2=camera.position.x,z2=camera.position.z;
+    if(Math.abs(dz)>1e-5) tryMoveTo(x2,z+dz,x2,z,Math.abs(dz));
+  }
+}
+function refreshCoordFields(force=false){
+  if(!hasMap)return;
+  const fields=[['posX',camera.position.x],['posY',floorY],['posZ',camera.position.z]];
+  for(const [id,val] of fields){ const el=$(id); if(force||document.activeElement!==el) el.value=Number(val).toFixed(2); }
+}
+function applyCoordinates(){
+  if(!hasMap)return;
+  const x=Number($('posX').value), y=Number($('posY').value), z=Number($('posZ').value);
+  if(![x,y,z].every(Number.isFinite))return;
+  camera.position.set(x,y+eyeHeight(),z); floorY=y; refreshCoordFields(true);
+}
+function returnToSpawn(){
+  if(!hasMap || !spawnPoint) return;
+  floorY = spawnPoint.y;
+  camera.position.set(spawnPoint.x, floorY + eyeHeight(), spawnPoint.z);
+  const center = mapBounds.getCenter(new THREE.Vector3());
+  const dx = center.x - spawnPoint.x, dz = center.z - spawnPoint.z;
+  camera.rotation.order='YXZ';
+  camera.rotation.set(-0.035, Math.hypot(dx,dz)>3 ? Math.atan2(-dx,-dz) : 0, 0);
+  refreshCoordFields(true);
+}
+function dropToSurface(){
+  if(!hasMap)return;
+  const y=findFloorAt(camera.position.x,camera.position.z,mapBounds.max.y+Math.max(50,mapBounds.getSize(new THREE.Vector3()).y),Math.max(200,mapBounds.getSize(new THREE.Vector3()).y+150));
+  if(y!==null){floorY=y+0.035;camera.position.y=floorY+eyeHeight();refreshCoordFields(true);}
+}
+function animate(now=performance.now()){
+  requestAnimationFrame(animate);
+  const dt=Math.min((now-lastFrame)/1000,0.05); lastFrame=now;
+  movePlayer(dt);
+  if(hasMap && now-fpsLast>300){ $('fps').textContent=Math.round(fpsFrames*1000/(now-fpsLast)); fpsFrames=0; fpsLast=now; refreshCoordFields(); }
+  fpsFrames++;
+  renderer.render(scene,camera);
+}
+init();
+</script>
+</body>
+</html>
