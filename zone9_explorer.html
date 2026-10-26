@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Zone 9 Explorer v4 — Jump, Noclip & Coordinates</title>
+<title>Zone 9 Explorer v5 — Map Select</title>
 <link rel="icon" href="data:,">
 <script type="importmap">
 {
@@ -18,8 +18,8 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1017;color:var(--text);font-family:Nunito,Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}canvas{display:block;width:100%;height:100%;outline:none}
 #view{position:fixed;inset:0}#hud{position:fixed;top:14px;left:14px;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:min(460px,calc(100vw - 28px))}.hud-chip{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;backdrop-filter:blur(12px);box-shadow:0 5px 25px #0002}.fps-line{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:800;letter-spacing:.5px}.dot{width:8px;height:8px;background:#62e6a7;border-radius:50%;box-shadow:0 0 12px #62e6a788}.fps-number{font-size:19px;line-height:1;color:#fff;font-variant-numeric:tabular-nums}.hint{font-size:12px;color:#b6c2d0;line-height:1.55}.key{border:1px solid #65728388;background:#242e3b;border-radius:4px;padding:1px 5px;color:#f2f7fb;font-weight:800}
 #panel{position:fixed;right:14px;top:14px;width:264px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;backdrop-filter:blur(16px);box-shadow:0 12px 36px #0004;transition:opacity .15s,transform .15s;z-index:5}#panel.hidden{display:none}.panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.panel-title{font-size:13px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase}.panel-tag{font-size:10px;color:#a9cfff;background:#1b4061;border:1px solid #2e5d83;border-radius:5px;padding:3px 6px;font-weight:900}.coords{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.field{min-width:0}.field label,.size-row label{display:block;font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.8px;margin:0 0 5px 2px}.field input{width:100%;min-width:0;background:#0a0f16;border:1px solid #354252;border-radius:8px;color:#f2f7fb;padding:9px 6px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;outline:none}.field input:focus,.field input:hover{border-color:#4e9fe8}.panel-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.btn{border:1px solid #3b4859;background:#202a37;color:#eaf3fd;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:850;cursor:pointer}.btn:hover{background:#2b3a4d}.btn.primary{background:var(--blue2);border-color:#348fe0;color:white}.btn.primary:hover{background:#278ce8}.size-row{margin-top:15px}.size-head{display:flex;align-items:center;justify-content:space-between}.size-value{font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;color:#dceeff}input[type=range]{width:100%;margin:10px 0 2px;accent-color:var(--blue);cursor:pointer}.size-range-labels{display:flex;justify-content:space-between;color:#8493a5;font-size:10px}.panel-foot{border-top:1px solid var(--line);margin-top:13px;padding-top:10px;color:#8f9eaf;font-size:10px;line-height:1.5}#showPanel{display:none;position:fixed;right:14px;top:14px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:#eef4fa;font-size:12px;font-weight:900;cursor:pointer;z-index:6;backdrop-filter:blur(12px)}#showPanel.visible{display:block}
-#loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1b2a3b 0%,#0b1017 65%);z-index:10;padding:20px}#loader.off{display:none}.load-card{width:min(440px,100%);padding:26px;background:rgba(14,20,29,.95);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 24px 80px #0008}.brand{font-size:11px;font-weight:900;letter-spacing:2.4px;color:#7bbcff}.load-title{font-size:28px;font-weight:900;letter-spacing:-.8px;margin:9px 0 7px}.load-desc{font-size:13px;color:#aab7c6;line-height:1.65;margin-bottom:20px}.file-button{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;padding:13px 15px;background:var(--blue2);border:1px solid #64b0fa;color:white;font-size:13px;font-weight:900;border-radius:10px;cursor:pointer}.file-button:hover{background:#278ce8}.file-button:disabled{opacity:.6;cursor:wait}#fileInput{display:none}#status{font-size:12px;color:#9eaec0;min-height:18px;margin-top:12px;line-height:1.5}.load-help{font-size:11px;color:#8190a2;margin-top:16px;line-height:1.6;border-top:1px solid var(--line);padding-top:13px}#error{color:#ff9b9b}#crosshair{position:fixed;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);pointer-events:none;display:none;opacity:.7}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}.locked #crosshair{display:block}#crosshair:before{width:10px;height:1px;left:0;top:4px}#crosshair:after{height:10px;width:1px;left:4px;top:0}
-@media(max-width:560px){#panel{right:8px;top:8px;width:242px;padding:11px}#hud{top:8px;left:8px;gap:6px}.hud-chip{padding:8px 10px}#showPanel{right:8px;top:8px}.load-title{font-size:24px}}
+#loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1b2a3b 0%,#0b1017 65%);z-index:10;padding:20px}#loader.off{display:none}.load-card{width:min(560px,100%);padding:26px;background:rgba(14,20,29,.95);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 24px 80px #0008}.brand{font-size:11px;font-weight:900;letter-spacing:2.4px;color:#7bbcff}.load-title{font-size:28px;font-weight:900;letter-spacing:-.8px;margin:9px 0 7px}.load-desc{font-size:13px;color:#aab7c6;line-height:1.65;margin-bottom:16px}.map-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:15px 0 12px}.map-option{min-width:0;text-align:left;display:flex;flex-direction:column;gap:7px;padding:17px 16px;background:#101823;border:1px solid #35465b;color:#f0f6fd;border-radius:12px;cursor:pointer;transition:border-color .12s,background .12s,transform .12s}.map-option:hover{background:#172538;transform:translateY(-1px)}.map-option.selected{border-color:#48a5ff;background:linear-gradient(145deg,#163a5c,#111e2d);box-shadow:inset 0 0 0 1px #48a5ff55,0 0 22px #1678d322}.map-option .map-num{font-size:10px;letter-spacing:1.5px;color:#79bbff;font-weight:900}.map-option strong{font-size:19px;letter-spacing:-.2px}.map-option small{font-size:11px;color:#a6b5c7;line-height:1.45}.file-button{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;padding:13px 15px;background:var(--blue2);border:1px solid #64b0fa;color:white;font-size:13px;font-weight:900;border-radius:10px;cursor:pointer}.file-button:hover{background:#278ce8}.file-button:disabled{opacity:.6;cursor:wait}#chooseBtn{margin-top:8px;background:#202a37;border-color:#3b4859}#chooseBtn:hover{background:#2b3a4d}#fileInput{display:none}#status{font-size:12px;color:#9eaec0;min-height:18px;margin-top:12px;line-height:1.5}.load-help{font-size:11px;color:#8190a2;margin-top:16px;line-height:1.6;border-top:1px solid var(--line);padding-top:13px}#error{color:#ff9b9b}#crosshair{position:fixed;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);pointer-events:none;display:none;opacity:.7}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}.locked #crosshair{display:block}#crosshair:before{width:10px;height:1px;left:0;top:4px}#crosshair:after{height:10px;width:1px;left:4px;top:0}
+@media(max-width:560px){#panel{right:8px;top:8px;width:242px;padding:11px}#hud{top:8px;left:8px;gap:6px}.hud-chip{padding:8px 10px}#showPanel{right:8px;top:8px}.load-title{font-size:24px}.load-card{padding:20px}.map-options{gap:7px}.map-option{padding:13px 11px}.map-option strong{font-size:16px}}
 #panel{max-height:calc(100vh - 28px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#435268 transparent}.coord-sliders{margin-top:5px}.coord-feedback{min-height:15px;margin-top:8px;color:#8fc8ff;font-size:10px;line-height:1.4}.noclip-on{background:#16442f!important;border-color:#38c88a!important;color:#bfffe0!important}
 </style>
 </head>
@@ -30,7 +30,7 @@
   <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SPACE</span> стрибок<br><span class="key">SHIFT</span> біг &nbsp; <span class="key">N</span> ноукліп &nbsp; <span class="key">G</span> панель<br><span class="key">МИША</span> огляд &nbsp; <span class="key">ESC</span> курсор</div>
 </div>
 <div id="panel">
-  <div class="panel-top"><div class="panel-title">Параметри гравця</div><div class="panel-tag">ZONE 9</div></div>
+  <div class="panel-top"><div class="panel-title">Параметри гравця</div><div class="panel-tag" id="activeMapTag">ZONE 9</div></div>
   <form id="coordsForm" novalidate>
     <div class="coords">
       <div class="field"><label for="posX">X</label><input id="posX" type="number" step="0.1" value="0" /></div>
@@ -45,7 +45,7 @@
 </div>
 <button id="showPanel" type="button">ПАРАМЕТРИ · G</button>
 <div id="crosshair"></div>
-<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Окремий переглядач твоєї GLB-карти. Масштаб zone9.glb автоматично виправляється, а стартова точка шукається по поверхні карти.</div><button class="file-button" id="chooseBtn" type="button"><span>＋</span> Вибрати zone9.glb</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Вибери файл <b>zone9.glb</b> зі свого пристрою.</div><div class="load-help">Керування: WASD — рух, Space — стрибок, N — Noclip, миша — огляд, Shift — біг, G — панель. У Noclip Space/Ctrl підіймають та опускають.</div></div></div>
+<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Обери карту</div><div class="load-desc">Вибери рівень, натисни «Грати» — і досліджуй його від першої особи. Можна також відкрити локальний файл GLB вручну.</div><div class="map-options" role="group" aria-label="Вибір карти"><button class="map-option selected" id="selectZone9" type="button" aria-pressed="true"><span class="map-num">MAP 01</span><strong>Zone 9</strong><small>zone9.glb<br>Міська/індустріальна зона</small></button><button class="map-option" id="selectProvince" type="button" aria-pressed="false"><span class="map-num">MAP 02</span><strong>Province</strong><small>province.glb<br>Відкрита провінція</small></button></div><button class="file-button" id="startGameBtn" type="button">▶　Грати · Zone 9</button><button class="file-button" id="chooseBtn" type="button">Вибрати файл GLB вручну</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Спочатку обери карту. Якщо файлів немає поруч зі сторінкою, завантаж їх вручну.</div><div class="load-help">WASD — рух · Space — стрибок · Shift — біг · N — Noclip · G — панель. У Noclip Space/Ctrl — вгору/вниз.</div></div></div>
 <script type="module">
 const $ = id => document.getElementById(id);
 let THREE, GLTFLoader, PointerLockControls;
@@ -72,6 +72,8 @@ let spawnPoint = null, mapScaleFactor = 1, speedMultiplier = 1;
 const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
+let selectedMapKey = 'zone9';
+const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'./zone9.glb'}, province: {label:'Province', file:'./province.glb'} };
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
 const down = new THREE.Vector3(0,-1,0);
@@ -99,16 +101,12 @@ function init(){
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', e => keys.delete(e.code));
   window.addEventListener('blur', () => keys.clear());
+  $('selectZone9').addEventListener('click', () => selectMap('zone9'));
+  $('selectProvince').addEventListener('click', () => selectMap('province'));
+  $('startGameBtn').addEventListener('click', startSelectedMap);
   $('chooseBtn').addEventListener('click', () => $('fileInput').click());
   $('fileInput').addEventListener('change', e => { const file=e.target.files?.[0]; if(file) loadMap(file); e.target.value=''; });
-  // A browser cannot reliably read a sibling file when the HTML is opened with file://.
-  // On localhost/HTTP we can load zone9.glb automatically from this HTML's folder.
-  if (location.protocol === 'http:' || location.protocol === 'https:') {
-    setStatus('Автоматично шукаю zone9.glb у цій самій папці…');
-    loadMapFromUrl('./zone9.glb');
-  } else {
-    setStatus('Відкрий цю сторінку кнопкою Start_Zone9_Windows.bat / Start_Zone9_Mac.command для авто-завантаження. Або вибери zone9.glb вручну нижче.');
-  }
+  setStatus('Обери Zone 9 або Province, а потім натисни «Грати».');
   $('coordsForm').addEventListener('submit', e => { e.preventDefault(); applyCoordinates(); });
   $('groundBtn').addEventListener('click', dropToSurface);
   $('spawnBtn').addEventListener('click', returnToSpawn);
@@ -138,16 +136,32 @@ function togglePanel(){$('panel').classList.toggle('hidden');$('showPanel').clas
 function toggleNoclip(){noclipEnabled=!noclipEnabled;const b=$('noclipBtn');b.textContent='Noclip: '+(noclipEnabled?'УВІМК.':'ВИМК.');b.classList.toggle('noclip-on',noclipEnabled);b.setAttribute('aria-pressed',String(noclipEnabled));$('modeStatus').style.display=noclipEnabled?'block':'none';$('coordFeedback').textContent=noclipEnabled?'Noclip увімкнено: політ крізь геометрію. Space/Ctrl — висота.':'Noclip вимкнено: гравітація повернулась.';if(noclipEnabled){verticalVelocity=0;isGrounded=false;}else{isGrounded=false;verticalVelocity=Math.min(verticalVelocity,0);}}
 function onResize(){ if(!camera||!renderer)return; camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.0)); }
 function setStatus(text, error=false){ statusEl.innerHTML = error ? '<span id="error">'+text+'</span>' : text; }
+function selectMap(key){
+  if(!MAP_OPTIONS[key])return;
+  selectedMapKey=key;
+  for(const [id,mapKey] of [['selectZone9','zone9'],['selectProvince','province']]){
+    const btn=$(id),selected=mapKey===key;
+    btn.classList.toggle('selected',selected);btn.setAttribute('aria-pressed',String(selected));
+  }
+  $('startGameBtn').textContent='▶　Грати · '+MAP_OPTIONS[key].label;
+  setStatus('Обрана карта: '+MAP_OPTIONS[key].label+'. Натисни «Грати».');
+}
+function startSelectedMap(){
+  const map=MAP_OPTIONS[selectedMapKey];if(!map)return;
+  $('startGameBtn').disabled=true;$('chooseBtn').disabled=true;
+  loadMapFromUrl(map.file,map.label+'.glb');
+}
 function loadMap(file){
   if(!file.name.toLowerCase().endsWith('.glb')){ setStatus('Вибери файл саме у форматі .glb', true); return; }
   const url = URL.createObjectURL(file);
   loadMapSource(url, file.name, true);
 }
-function loadMapFromUrl(url){
-  loadMapSource(url, 'zone9.glb', false);
+function loadMapFromUrl(url, displayName='zone9.glb'){
+  loadMapSource(url, displayName, false);
 }
 function loadMapSource(url, displayName, revokeUrl){
   $('chooseBtn').disabled = true;
+  if($('startGameBtn'))$('startGameBtn').disabled=true;
   setStatus('Завантаження '+escapeHtml(displayName)+'…');
   const gltfLoader = new GLTFLoader();
   gltfLoader.load(url, gltf => {
@@ -191,13 +205,13 @@ function loadMapSource(url, displayName, revokeUrl){
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
       const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
       camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
-      hasMap=true; loaderScreen.classList.add('off'); refreshCoordFields(true);
+      hasMap=true; $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
       $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
       console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
     }catch(err){
       console.error(err);
       setStatus('Не вдалося підготувати карту: '+escapeHtml(err.message||String(err)),true);
-      $('chooseBtn').disabled=false;
+      $('chooseBtn').disabled=false; if($('startGameBtn'))$('startGameBtn').disabled=false;
     }finally{
       if(revokeUrl) URL.revokeObjectURL(url);
     }
@@ -206,11 +220,11 @@ function loadMapSource(url, displayName, revokeUrl){
   }, err => {
     console.warn('Не вдалося автоматично завантажити '+displayName+':', err);
     if(revokeUrl) URL.revokeObjectURL(url);
-    $('chooseBtn').disabled=false;
+    $('chooseBtn').disabled=false; if($('startGameBtn'))$('startGameBtn').disabled=false;
     if(!revokeUrl && location.protocol === 'file:') {
-      setStatus('Браузер не дозволив відкрити сусідній файл напряму. Запусти локальний сервер або натисни «Вибрати zone9.glb».',true);
+      setStatus('Браузер не дозволив відкрити сусідній файл напряму. Запусти локальний сервер або вибери GLB вручну.',true);
     } else {
-      setStatus('Не вдалося завантажити '+escapeHtml(displayName)+'. Перевір, що zone9.glb лежить у тій самій папці з HTML, або вибери файл кнопкою нижче.',true);
+      setStatus('Не вдалося завантажити '+escapeHtml(displayName)+'. Переконайся, що файл лежить у корені сайту поруч із HTML, або вибери його вручну.',true);
     }
   });
 }
