@@ -238,37 +238,37 @@ function findFloorAt(x,z,originY,far){
   for(const h of hits){ if(Math.abs(normalY(h))>0.48) return h.point.y; }
   return null;
 }
+function spawnHasRoom(p){
+  const heights=[.72,1.28].map(h=>p.y+h*playerScale);
+  const dirs=[new THREE.Vector3(1,0,0),new THREE.Vector3(-1,0,0),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,-1),new THREE.Vector3(.707,0,.707),new THREE.Vector3(-.707,0,.707),new THREE.Vector3(.707,0,-.707),new THREE.Vector3(-.707,0,-.707)];
+  for(const h of heights)for(const dir of dirs){
+    raycaster.set(new THREE.Vector3(p.x,h,p.z),dir);raycaster.near=.08;raycaster.far=.82*playerScale;
+    const hits=raycaster.intersectObject(mapRoot,true);
+    if(hits.some(hit=>hit.distance<.82*playerScale&&Math.abs(normalY(hit))<.58))return false;
+  }
+  return true;
+}
 function findSpawn(){
-  const size = new THREE.Vector3(); mapBounds.getSize(size);
-  const center = new THREE.Vector3(); mapBounds.getCenter(center);
-  const origin = mapBounds.max.y + Math.max(20, size.y * 0.25);
-  const far = Math.max(300, size.y + Math.max(30, size.y * 0.25) + 50);
-  const candidates = [];
-  // Sample a grid across the map. Picking the lowest commonly reachable
-  // floor-level surfaces avoids spawning on the roof of the central building.
-  const divisions = 8;
-  for(let ix=1; ix<divisions; ix++){
-    const x = mapBounds.min.x + size.x * ix / divisions;
-    for(let iz=1; iz<divisions; iz++){
-      const z = mapBounds.min.z + size.z * iz / divisions;
-      const y = findFloorAt(x,z,origin,far);
-      if(y !== null && Number.isFinite(y)) candidates.push({x,y,z});
+  const size=mapBounds.getSize(new THREE.Vector3()),center=mapBounds.getCenter(new THREE.Vector3());
+  const origin=mapBounds.max.y+Math.max(20,size.y*.25),far=Math.max(300,size.y+Math.max(30,size.y*.25)+50),candidates=[];
+  const divisions=14;
+  for(let ix=2;ix<divisions-1;ix++){
+    const x=mapBounds.min.x+size.x*ix/divisions;
+    for(let iz=2;iz<divisions-1;iz++){
+      const z=mapBounds.min.z+size.z*iz/divisions,y=findFloorAt(x,z,origin,far);
+      if(y!==null&&Number.isFinite(y))candidates.push({x,y,z});
     }
   }
-  // Always include the exact center as a candidate too.
-  const centerY = findFloorAt(center.x,center.z,origin,far);
-  if(centerY !== null && Number.isFinite(centerY)) candidates.push({x:center.x,y:centerY,z:center.z});
-  if(!candidates.length) return {x:center.x,y:mapBounds.min.y+0.1,z:center.z};
-  const lowestY = Math.min(...candidates.map(p=>p.y));
-  const floorBand = Math.max(2.5, size.y * 0.07);
-  const lowSurfaces = candidates.filter(p=>p.y <= lowestY + floorBand);
-  lowSurfaces.sort((a,b)=>{
-    const da=(a.x-center.x)**2+(a.z-center.z)**2;
-    const db=(b.x-center.x)**2+(b.z-center.z)**2;
-    return da-db;
+  if(!candidates.length)return{x:center.x,y:mapBounds.min.y+.1,z:center.z};
+  const lowestY=Math.min(...candidates.map(p=>p.y)),floorBand=Math.max(.55,size.y*.012);
+  let low=candidates.filter(p=>p.y<=lowestY+floorBand);if(!low.length)low=candidates;
+  low.sort((a,b)=>{
+    const da=Math.hypot((a.x-center.x)/Math.max(size.x*.5,1),(a.z-center.z)/Math.max(size.z*.5,1));
+    const db=Math.hypot((b.x-center.x)/Math.max(size.x*.5,1),(b.z-center.z)/Math.max(size.z*.5,1));
+    return db-da;
   });
-  const best = lowSurfaces[0] || candidates[0];
-  return {x:best.x, y:best.y+0.035, z:best.z};
+  const shortlist=low.slice(0,16),best=shortlist.find(spawnHasRoom)||low[0]||candidates[0];
+  return{x:best.x,y:best.y+.035,z:best.z};
 }
 function wallBlocked(fromX,fromZ,toX,toZ,feet,dist){
   if(dist<0.0001)return false;
