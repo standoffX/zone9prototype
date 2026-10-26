@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Zone 9 Explorer v6 — Tactical Knife & Zone 9</title>
+<title>Zone 9 Explorer v7 — Clean First Person</title>
 <link rel="icon" href="data:,">
 <script type="importmap">
 {
@@ -27,7 +27,7 @@
 <div id="view"></div>
 <div id="hud">
   <div class="hud-chip"><div class="fps-line"><span class="dot"></span><span class="fps-number" id="fps">--</span><span>FPS</span><span style="margin-left:auto;color:#8293a5;font-size:10px;font-weight:800" id="quality">WEBGL</span></div><div id="modeStatus" style="display:none;margin-top:7px;font-size:10px;font-weight:900;letter-spacing:.8px;color:#a8ffd0">NOCLIP · FLY</div></div>
-  <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SPACE</span> стрибок<br><span class="key">SHIFT</span> біг &nbsp; <span class="key">N</span> ноукліп &nbsp; <span class="key">G</span> панель<br><span class="key">ЛКМ</span> удар ножем &nbsp; <span class="key">F</span> огляд &nbsp; <span class="key">ESC</span> курсор</div>
+  <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SPACE</span> стрибок<br><span class="key">SHIFT</span> біг &nbsp; <span class="key">N</span> ноукліп &nbsp; <span class="key">G</span> панель<br><span class="key">МИША</span> огляд &nbsp; <span class="key">ESC</span> курсор</div>
 </div>
 <div id="panel">
   <div class="panel-top"><div class="panel-title">Параметри гравця</div><div class="panel-tag" id="activeMapTag">ZONE 9</div></div>
@@ -45,7 +45,7 @@
 </div>
 <button id="showPanel" type="button">ПАРАМЕТРИ · G</button>
 <div id="crosshair"></div>
-<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Основна карта для вільного дослідження. Обери Zone 9 і натисни «Грати». Province тимчасово прибрана, бо її модель потрібно переробити.</div><div class="map-options" role="group" aria-label="Вибір карти"><button class="map-option selected" id="selectZone9" type="button" aria-pressed="true"><span class="map-num">MAP 01 · READY</span><strong>Zone 9</strong><small>zone9.glb · від першої особи</small></button></div><button class="file-button" id="startGameBtn" type="button">▶　Грати · Zone 9</button><button class="file-button" id="chooseBtn" type="button">Вибрати файл GLB вручну</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Спочатку обери карту. Якщо файлів немає поруч зі сторінкою, завантаж їх вручну.</div><div class="load-help">WASD — рух · Space — стрибок · Shift — біг · N — Noclip · G — панель · ЛКМ — удар · F — огляд ножа.</div></div></div>
+<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Основна карта для вільного дослідження. Обери Zone 9 і натисни «Грати». Province тимчасово прибрана, бо її модель потрібно переробити.</div><div class="map-options" role="group" aria-label="Вибір карти"><button class="map-option selected" id="selectZone9" type="button" aria-pressed="true"><span class="map-num">MAP 01 · READY</span><strong>Zone 9</strong><small>zone9.glb · від першої особи</small></button></div><button class="file-button" id="startGameBtn" type="button">▶　Грати · Zone 9</button><button class="file-button" id="chooseBtn" type="button">Вибрати файл GLB вручну</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Спочатку обери карту. Якщо файлів немає поруч зі сторінкою, завантаж їх вручну.</div><div class="load-help">WASD — рух · Space — стрибок · Shift — біг · N — Noclip · G — панель.</div></div></div>
 <script type="module">
 const $ = id => document.getElementById(id);
 let THREE, GLTFLoader, PointerLockControls;
@@ -69,7 +69,6 @@ try {
 const view = $('view'), loaderScreen = $('loader'), statusEl = $('status');
 let scene, camera, renderer, controls, mapRoot, mapScaleRoot, mapBounds = new THREE.Box3();
 let spawnPoint = null, mapScaleFactor = 1, speedMultiplier = 1;
-let knifeView = null, knifeAction = null, knifeActionStarted = 0;
 const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
@@ -86,22 +85,18 @@ const WALK_SPEED = 4.2, RUN_SPEED = 7.0, STEP_UP = 0.42, MAX_DROP = 1.65;
 function init(){
   scene = new THREE.Scene(); scene.background = new THREE.Color(0x9da8b4);
   camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.05, 10000);
-  scene.add(camera);
   renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance', alpha:false});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.0));
   renderer.setSize(innerWidth, innerHeight); renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   view.appendChild(renderer.domElement);
   controls = new PointerLockControls(camera, renderer.domElement);
-  createKnifeViewModel();
   scene.add(new THREE.HemisphereLight(0xffffff, 0x6c7480, 2.0));
   const sun = new THREE.DirectionalLight(0xffffff, 2.0); sun.position.set(80,140,60); scene.add(sun);
   mapRoot = new THREE.Group(); scene.add(mapRoot);
-  controls.addEventListener('lock', () => { document.body.classList.add('locked'); if(knifeView && hasMap) knifeView.root.visible=true; });
-  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); if(knifeView) knifeView.root.visible=false; });
+  controls.addEventListener('lock', () => document.body.classList.add('locked'));
+  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); });
   renderer.domElement.addEventListener('click', () => { if(hasMap && !controls.isLocked && !isUiFocused()) controls.lock(); });
-  renderer.domElement.addEventListener('mousedown', e => { if(!hasMap || !controls.isLocked) return; if(e.button===0) playKnifeAction('slash'); else if(e.button===2) playKnifeAction('stab'); });
-  window.addEventListener('contextmenu', e => { if(controls?.isLocked) e.preventDefault(); });
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', e => keys.delete(e.code));
@@ -128,80 +123,10 @@ function init(){
   $('showPanel').addEventListener('click', togglePanel);
   animate();
 }
-function createKnifeViewModel(){
-  const root=new THREE.Group();root.name='Zone9_FirstPersonKnife';root.position.set(.405,-.335,-.82);root.scale.setScalar(.72);root.rotation.set(.02,-.07,-.31);root.visible=false;camera.add(root);
-  const bladeMat=new THREE.MeshStandardMaterial({color:0x8ea4b8,metalness:.86,roughness:.22,emissive:0x07131f,side:THREE.DoubleSide});
-  const edgeMat=new THREE.MeshStandardMaterial({color:0x54c5ff,metalness:.6,roughness:.24,emissive:0x123f60});
-  const darkMetal=new THREE.MeshStandardMaterial({color:0x1a2532,metalness:.78,roughness:.3});
-  const gripMat=new THREE.MeshStandardMaterial({color:0x18212b,metalness:.22,roughness:.78});
-  const gripEdge=new THREE.MeshStandardMaterial({color:0x334354,metalness:.35,roughness:.62});
-  const gloveMat=new THREE.MeshStandardMaterial({color:0x202c38,metalness:.12,roughness:.9});
-  const glovePad=new THREE.MeshStandardMaterial({color:0x394858,metalness:.15,roughness:.78});
-  const sleeveMat=new THREE.MeshStandardMaterial({color:0x263747,metalness:.06,roughness:.96});
-  const seamMat=new THREE.MeshStandardMaterial({color:0x566c7b,metalness:.16,roughness:.78});
-  const addMesh=(geometry,material,name,pos,scale,rot)=>{
-    const m=new THREE.Mesh(geometry,material);m.name=name;if(pos)m.position.set(...pos);if(scale)m.scale.set(...scale);if(rot)m.rotation.set(...rot);m.renderOrder=50;m.frustumCulled=false;
-    material.depthTest=false;material.depthWrite=false;root.add(m);return m;
-  };
-  const addSegment=(a,b,radius,material,name)=>{
-    const va=new THREE.Vector3(...a),vb=new THREE.Vector3(...b),axis=new THREE.Vector3().subVectors(vb,va);
-    const mesh=addMesh(new THREE.CylinderGeometry(radius*.85,radius,axis.length(),10,1),material,name,va.clone().add(vb).multiplyScalar(.5).toArray());
-    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),axis.normalize());return mesh;
-  };
-  addSegment([.13,-.17,-.01],[.36,-.60,.015],.092,sleeveMat,'Sleeve');
-  addMesh(new THREE.CylinderGeometry(.088,.098,.075,10),seamMat,'Sleeve cuff',[.15,-.205,-.002],null,[0,0,-.49]);
-  addMesh(new THREE.SphereGeometry(1,12,10),gloveMat,'Glove palm',[.018,-.105,.066],[.105,.117,.075],[0,0,-.22]);
-  addMesh(new THREE.SphereGeometry(1,10,8),glovePad,'Glove thumb',[-.074,-.087,.071],[.043,.078,.046],[0,0,-.72]);
-  for(let i=0;i<3;i++)addMesh(new THREE.BoxGeometry(.039,.052,.036),glovePad,'Knuckle pad '+i,[.004+i*.033,-.037,.103]);
-  addMesh(new THREE.CapsuleGeometry(.043,.17,3,8),gripMat,'Knife grip',[0,-.135,.028],null,[0,0,-.04]);
-  for(let i=0;i<5;i++)addMesh(new THREE.BoxGeometry(.086,.012,.078),gripEdge,'Grip wrap '+i,[0,-.207+i*.035,.031],null,[0,0,-.04]);
-  addMesh(new THREE.SphereGeometry(1,10,8),darkMetal,'Pommel',[0,-.253,.027],[.055,.036,.052]);
-  addMesh(new THREE.BoxGeometry(.19,.042,.085),darkMetal,'Crossguard',[0,.005,.028],null,[0,0,-.035]);
-  addMesh(new THREE.BoxGeometry(.055,.035,.082),gripEdge,'Guard collar',[0,.026,.028]);
-  const bladeShape=new THREE.Shape();
-  bladeShape.moveTo(-.045,.035);bladeShape.lineTo(.047,.035);bladeShape.lineTo(.057,.17);bladeShape.lineTo(.049,.36);bladeShape.lineTo(.024,.565);bladeShape.lineTo(0,.735);bladeShape.lineTo(-.031,.62);bladeShape.lineTo(-.055,.405);bladeShape.lineTo(-.058,.19);bladeShape.closePath();
-  const bladeGeom=new THREE.ExtrudeGeometry(bladeShape,{depth:.044,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.005,bevelThickness:.006});bladeGeom.computeVertexNormals();
-  addMesh(bladeGeom,bladeMat,'Tactical blade',[0,0,.018]);
-  addMesh(new THREE.BoxGeometry(.009,.36,.006),edgeMat,'Blue fuller',[-.026,.335,.067],null,[0,0,-.03]);
-  addMesh(new THREE.BoxGeometry(.006,.085,.006),darkMetal,'Blade notch',[.035,.14,.067],null,[0,0,-.02]);
-  addMesh(new THREE.CylinderGeometry(.009,.009,.009,8),edgeMat,'Grip pin',[-.013,-.105,.072],null,[Math.PI/2,0,0]);
-  knifeView={root,basePosition:root.position.clone(),baseRotation:root.rotation.clone(),action:null,actionStart:0};
-}
-function playKnifeAction(action){
-  if(!knifeView||!hasMap||!controls?.isLocked)return;
-  knifeAction=action;knifeActionStarted=performance.now();knifeView.action=action;knifeView.actionStart=knifeActionStarted;
-}
-function updateKnifeView(now){
-  if(!knifeView||!knifeView.root.visible)return;
-  const root=knifeView.root,t=now*.001;
-  const moving=controls.isLocked&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k));
-  const bob=moving?1:0;
-  let x=knifeView.basePosition.x+Math.sin(t*8.1)*.008*bob;
-  let y=knifeView.basePosition.y+Math.sin(t*14)*.011*bob+Math.sin(t*1.7)*.003;
-  let z=knifeView.basePosition.z;
-  let rx=knifeView.baseRotation.x+Math.sin(t*8.1)*.012*bob;
-  let ry=knifeView.baseRotation.y;
-  let rz=knifeView.baseRotation.z+Math.sin(t*8.1)*.014*bob;
-  const action=knifeView.action;
-  if(action){
-    const duration=action==='inspect'?1220:(action==='stab'?390:470);
-    const q=(now-knifeView.actionStart)/duration;
-    if(q>=1){knifeView.action=null;knifeAction=null;}
-    else{
-      const w=Math.sin(Math.PI*Math.max(0,q));
-      if(action==='slash'){x-=.17*w;y-=.045*w;z+=.045*w;rx+=.34*w;rz-=1.12*w;ry+=.18*Math.sin(q*Math.PI*2);}
-      else if(action==='stab'){x+=.015*w;y-=.045*w;z-=.24*w;rx-=.2*w;rz+=.08*w;}
-      else if(action==='inspect'){x-=.06*w;y+=.075*w;z+=.025*w;rx+=.32*w;ry+=1.4*w;rz-=.62*w+.13*Math.sin(q*Math.PI*2);}
-    }
-  }
-  root.position.set(x,y,z);root.rotation.set(rx,ry,rz);
-}
-
 function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
 function onKeyDown(e){
   if(e.code==='KeyG'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();togglePanel();return;}
   if(e.code==='KeyN'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();toggleNoclip();return;}
-  if(e.code==='KeyF'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){if(controls?.isLocked){e.preventDefault();playKnifeAction('inspect');}return;}
   if(e.code==='Space'&&!e.repeat){e.preventDefault();if(noclipEnabled)keys.add(e.code);else if(controls?.isLocked&&isGrounded)jumpQueued=true;return;}
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight','ControlLeft','ControlRight'].includes(e.code))keys.add(e.code);
   if(e.code.startsWith('Arrow')&&controls?.isLocked)e.preventDefault();
@@ -279,7 +204,7 @@ function loadMapSource(url, displayName, revokeUrl){
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
       const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
       camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
-      hasMap=true; $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); if(knifeView) knifeView.root.visible=!!controls.isLocked; refreshCoordFields(true);
+      hasMap=true; $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
       $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
       console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
     }catch(err){
@@ -464,7 +389,6 @@ function animate(now=performance.now()){
   requestAnimationFrame(animate);
   const dt=Math.min((now-lastFrame)/1000,0.05); lastFrame=now;
   movePlayer(dt);
-  updateKnifeView(now);
   if(hasMap && now-fpsLast>300){ $('fps').textContent=Math.round(fpsFrames*1000/(now-fpsLast)); fpsFrames=0; fpsLast=now; refreshCoordFields(); }
   fpsFrames++;
   renderer.render(scene,camera);
