@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Zone 9 Explorer v2 — Map Scale & Spawn Fix</title>
+<title>Zone 9 Explorer v4 — Jump, Noclip & Coordinates</title>
 <link rel="icon" href="data:,">
 <script type="importmap">
 {
@@ -20,30 +20,32 @@
 #panel{position:fixed;right:14px;top:14px;width:264px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:14px;backdrop-filter:blur(16px);box-shadow:0 12px 36px #0004;transition:opacity .15s,transform .15s;z-index:5}#panel.hidden{display:none}.panel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.panel-title{font-size:13px;font-weight:900;letter-spacing:1.1px;text-transform:uppercase}.panel-tag{font-size:10px;color:#a9cfff;background:#1b4061;border:1px solid #2e5d83;border-radius:5px;padding:3px 6px;font-weight:900}.coords{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}.field{min-width:0}.field label,.size-row label{display:block;font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.8px;margin:0 0 5px 2px}.field input{width:100%;min-width:0;background:#0a0f16;border:1px solid #354252;border-radius:8px;color:#f2f7fb;padding:9px 6px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;outline:none}.field input:focus,.field input:hover{border-color:#4e9fe8}.panel-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.btn{border:1px solid #3b4859;background:#202a37;color:#eaf3fd;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:850;cursor:pointer}.btn:hover{background:#2b3a4d}.btn.primary{background:var(--blue2);border-color:#348fe0;color:white}.btn.primary:hover{background:#278ce8}.size-row{margin-top:15px}.size-head{display:flex;align-items:center;justify-content:space-between}.size-value{font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;color:#dceeff}input[type=range]{width:100%;margin:10px 0 2px;accent-color:var(--blue);cursor:pointer}.size-range-labels{display:flex;justify-content:space-between;color:#8493a5;font-size:10px}.panel-foot{border-top:1px solid var(--line);margin-top:13px;padding-top:10px;color:#8f9eaf;font-size:10px;line-height:1.5}#showPanel{display:none;position:fixed;right:14px;top:14px;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:#eef4fa;font-size:12px;font-weight:900;cursor:pointer;z-index:6;backdrop-filter:blur(12px)}#showPanel.visible{display:block}
 #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 35%,#1b2a3b 0%,#0b1017 65%);z-index:10;padding:20px}#loader.off{display:none}.load-card{width:min(440px,100%);padding:26px;background:rgba(14,20,29,.95);border:1px solid #ffffff20;border-radius:18px;box-shadow:0 24px 80px #0008}.brand{font-size:11px;font-weight:900;letter-spacing:2.4px;color:#7bbcff}.load-title{font-size:28px;font-weight:900;letter-spacing:-.8px;margin:9px 0 7px}.load-desc{font-size:13px;color:#aab7c6;line-height:1.65;margin-bottom:20px}.file-button{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;padding:13px 15px;background:var(--blue2);border:1px solid #64b0fa;color:white;font-size:13px;font-weight:900;border-radius:10px;cursor:pointer}.file-button:hover{background:#278ce8}.file-button:disabled{opacity:.6;cursor:wait}#fileInput{display:none}#status{font-size:12px;color:#9eaec0;min-height:18px;margin-top:12px;line-height:1.5}.load-help{font-size:11px;color:#8190a2;margin-top:16px;line-height:1.6;border-top:1px solid var(--line);padding-top:13px}#error{color:#ff9b9b}#crosshair{position:fixed;left:50%;top:50%;width:10px;height:10px;transform:translate(-50%,-50%);pointer-events:none;display:none;opacity:.7}#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 3px #000}.locked #crosshair{display:block}#crosshair:before{width:10px;height:1px;left:0;top:4px}#crosshair:after{height:10px;width:1px;left:4px;top:0}
 @media(max-width:560px){#panel{right:8px;top:8px;width:242px;padding:11px}#hud{top:8px;left:8px;gap:6px}.hud-chip{padding:8px 10px}#showPanel{right:8px;top:8px}.load-title{font-size:24px}}
+#panel{max-height:calc(100vh - 28px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:#435268 transparent}.coord-sliders{margin-top:5px}.coord-feedback{min-height:15px;margin-top:8px;color:#8fc8ff;font-size:10px;line-height:1.4}.noclip-on{background:#16442f!important;border-color:#38c88a!important;color:#bfffe0!important}
 </style>
 </head>
 <body>
 <div id="view"></div>
 <div id="hud">
-  <div class="hud-chip"><div class="fps-line"><span class="dot"></span><span class="fps-number" id="fps">--</span><span>FPS</span><span style="margin-left:auto;color:#8293a5;font-size:10px;font-weight:800" id="quality">WEBGL</span></div></div>
-  <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SHIFT</span> швидше<br><span class="key">МИША</span> огляд &nbsp; <span class="key">G</span> панель &nbsp; <span class="key">ESC</span> курсор</div>
+  <div class="hud-chip"><div class="fps-line"><span class="dot"></span><span class="fps-number" id="fps">--</span><span>FPS</span><span style="margin-left:auto;color:#8293a5;font-size:10px;font-weight:800" id="quality">WEBGL</span></div><div id="modeStatus" style="display:none;margin-top:7px;font-size:10px;font-weight:900;letter-spacing:.8px;color:#a8ffd0">NOCLIP · FLY</div></div>
+  <div class="hud-chip hint"><span class="key">W A S D</span> рух &nbsp; <span class="key">SPACE</span> стрибок<br><span class="key">SHIFT</span> біг &nbsp; <span class="key">N</span> ноукліп &nbsp; <span class="key">G</span> панель<br><span class="key">МИША</span> огляд &nbsp; <span class="key">ESC</span> курсор</div>
 </div>
 <div id="panel">
   <div class="panel-top"><div class="panel-title">Параметри гравця</div><div class="panel-tag">ZONE 9</div></div>
-  <form id="coordsForm">
+  <form id="coordsForm" novalidate>
     <div class="coords">
       <div class="field"><label for="posX">X</label><input id="posX" type="number" step="0.1" value="0" /></div>
       <div class="field"><label for="posY">Y / ВИСОТА</label><input id="posY" type="number" step="0.1" value="0" /></div>
       <div class="field"><label for="posZ">Z</label><input id="posZ" type="number" step="0.1" value="0" /></div>
     </div>
-    <div class="panel-buttons"><button class="btn primary" type="submit">Застосувати</button><button class="btn" type="button" id="groundBtn">На поверхню</button><button class="btn" type="button" id="spawnBtn">На спавн</button></div>
+    <div class="panel-buttons"><button class="btn primary" type="submit">Застосувати</button><button class="btn" type="button" id="groundBtn">На поверхню</button><button class="btn" type="button" id="spawnBtn">На спавн</button><button class="btn" type="button" id="noclipBtn" aria-pressed="false">Noclip: ВИМК.</button></div><div class="coord-sliders"><div class="size-row"><div class="size-head"><label for="xRange">X · ГОРИЗОНТАЛЬ</label><span class="size-value" id="xValue">0.00</span></div><input id="xRange" type="range" min="-100" max="100" step="0.1" value="0"/></div><div class="size-row"><div class="size-head"><label for="yRange">Y · ВИСОТА</label><span class="size-value" id="yValue">0.00</span></div><input id="yRange" type="range" min="-20" max="100" step="0.1" value="0"/></div><div class="size-row"><div class="size-head"><label for="zRange">Z · ГОРИЗОНТАЛЬ</label><span class="size-value" id="zValue">0.00</span></div><input id="zRange" type="range" min="-100" max="100" step="0.1" value="0"/></div></div><div id="coordFeedback" class="coord-feedback" aria-live="polite"></div>
   </form>
   <div class="size-row"><div class="size-head"><label for="sizeRange">РОЗМІР ПЕРСОНАЖА</label><span class="size-value" id="sizeValue">1.00×</span></div><input id="sizeRange" type="range" min="0.50" max="2.00" step="0.05" value="1.00"/><div class="size-range-labels"><span>Менший</span><span>Більший</span></div></div>
-  <div class="panel-foot">Координати можна змінювати вручну. «На поверхню» шукає землю під гравцем, «На спавн» повертає у стартову точку. Розмір змінює висоту огляду й радіус колізій.</div>
+  <div class="size-row"><div class="size-head"><label for="speedRange">ШВИДКІСТЬ РУХУ</label><span class="size-value" id="speedValue">1.0×</span></div><input id="speedRange" type="range" min="0.5" max="2.5" step="0.1" value="1.0"/><div class="size-range-labels"><span>Повільніше</span><span>Швидше</span></div></div>
+  <div class="panel-foot">Space — стрибок. N або кнопка Noclip — вільний політ крізь стіни; у цьому режимі Space/Ctrl піднімають і опускають. Координати можна змінювати цифрами або повзунками X/Y/Z. «На поверхню» шукає землю, «На спавн» повертає на старт.</div>
 </div>
 <button id="showPanel" type="button">ПАРАМЕТРИ · G</button>
 <div id="crosshair"></div>
-<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Окремий переглядач твоєї GLB-карти. Масштаб zone9.glb автоматично виправляється, а стартова точка шукається по поверхні карти.</div><button class="file-button" id="chooseBtn" type="button"><span>＋</span> Вибрати zone9.glb</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Вибери файл <b>zone9.glb</b> зі свого пристрою.</div><div class="load-help">Керування: WASD — ходьба, миша — огляд, Shift — біг, G — показати/сховати координати. Esc — звільнити курсор.</div></div></div>
+<div id="loader"><div class="load-card"><div class="brand">MAP EXPLORER</div><div class="load-title">Zone 9</div><div class="load-desc">Окремий переглядач твоєї GLB-карти. Масштаб zone9.glb автоматично виправляється, а стартова точка шукається по поверхні карти.</div><button class="file-button" id="chooseBtn" type="button"><span>＋</span> Вибрати zone9.glb</button><input id="fileInput" type="file" accept=".glb,model/gltf-binary"/><div id="status">Вибери файл <b>zone9.glb</b> зі свого пристрою.</div><div class="load-help">Керування: WASD — рух, Space — стрибок, N — Noclip, миша — огляд, Shift — біг, G — панель. У Noclip Space/Ctrl підіймають та опускають.</div></div></div>
 <script type="module">
 const $ = id => document.getElementById(id);
 let THREE, GLTFLoader, PointerLockControls;
@@ -66,8 +68,10 @@ try {
 }
 const view = $('view'), loaderScreen = $('loader'), statusEl = $('status');
 let scene, camera, renderer, controls, mapRoot, mapScaleRoot, mapBounds = new THREE.Box3();
-let spawnPoint = null, mapScaleFactor = 1;
+let spawnPoint = null, mapScaleFactor = 1, speedMultiplier = 1;
+const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
+let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
 const down = new THREE.Vector3(0,-1,0);
@@ -78,7 +82,7 @@ const WALK_SPEED = 4.2, RUN_SPEED = 7.0, STEP_UP = 0.42, MAX_DROP = 1.65;
 
 function init(){
   scene = new THREE.Scene(); scene.background = new THREE.Color(0x9da8b4);
-  camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.05, 2000);
+  camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.05, 10000);
   renderer = new THREE.WebGLRenderer({antialias:false, powerPreference:'high-performance', alpha:false});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.0));
   renderer.setSize(innerWidth, innerHeight); renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -113,16 +117,25 @@ function init(){
     if(hasMap) camera.position.y = floorY + eyeHeight();
     refreshCoordFields(true);
   });
+  for(const axis of ['X','Y','Z']){
+    $('pos'+axis).addEventListener('change',()=>syncRangeFromField(axis));
+    $(axis.toLowerCase()+'Range').addEventListener('input',()=>applyAxisSlider(axis));
+  }
+  $('noclipBtn').addEventListener('click',toggleNoclip);
+  $('speedRange').addEventListener('input',e=>{speedMultiplier=Number(e.target.value);$('speedValue').textContent=speedMultiplier.toFixed(1)+'×';});
   $('showPanel').addEventListener('click', togglePanel);
   animate();
 }
 function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
 function onKeyDown(e){
-  if(e.code==='KeyG' && !e.repeat && !['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){ e.preventDefault(); togglePanel(); return; }
-  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)) keys.add(e.code);
-  if(e.code.startsWith('Arrow') && controls?.isLocked) e.preventDefault();
+  if(e.code==='KeyG'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();togglePanel();return;}
+  if(e.code==='KeyN'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();toggleNoclip();return;}
+  if(e.code==='Space'&&!e.repeat){e.preventDefault();if(noclipEnabled)keys.add(e.code);else if(controls?.isLocked&&isGrounded)jumpQueued=true;return;}
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight','ControlLeft','ControlRight'].includes(e.code))keys.add(e.code);
+  if(e.code.startsWith('Arrow')&&controls?.isLocked)e.preventDefault();
 }
-function togglePanel(){ $('panel').classList.toggle('hidden'); $('showPanel').classList.toggle('visible', $('panel').classList.contains('hidden')); }
+function togglePanel(){$('panel').classList.toggle('hidden');$('showPanel').classList.toggle('visible',$('panel').classList.contains('hidden'));}
+function toggleNoclip(){noclipEnabled=!noclipEnabled;const b=$('noclipBtn');b.textContent='Noclip: '+(noclipEnabled?'УВІМК.':'ВИМК.');b.classList.toggle('noclip-on',noclipEnabled);b.setAttribute('aria-pressed',String(noclipEnabled));$('modeStatus').style.display=noclipEnabled?'block':'none';$('coordFeedback').textContent=noclipEnabled?'Noclip увімкнено: політ крізь геометрію. Space/Ctrl — висота.':'Noclip вимкнено: гравітація повернулась.';if(noclipEnabled){verticalVelocity=0;isGrounded=false;}else{isGrounded=false;verticalVelocity=Math.min(verticalVelocity,0);}}
 function onResize(){ if(!camera||!renderer)return; camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.0)); }
 function setStatus(text, error=false){ statusEl.innerHTML = error ? '<span id="error">'+text+'</span>' : text; }
 function loadMap(file){
@@ -169,7 +182,10 @@ function loadMapSource(url, displayName, revokeUrl){
       });
       mapRoot.updateMatrixWorld(true); mapBounds.setFromObject(mapRoot);
       if(mapBounds.isEmpty() || !Number.isFinite(mapBounds.min.y)) throw new Error('У файлі не знайдено геометрію карти.');
+      configureCoordinateRanges();
+      buildLampLighting(model);
       const spawn = findSpawn(); floorY=spawn.y; spawnPoint = new THREE.Vector3(spawn.x, spawn.y, spawn.z);
+      verticalVelocity=0;isGrounded=true;noclipEnabled=false;$('noclipBtn').textContent='Noclip: ВИМК.';$('noclipBtn').classList.remove('noclip-on');$('noclipBtn').setAttribute('aria-pressed','false');$('modeStatus').style.display='none';
       camera.position.set(spawn.x, floorY+eyeHeight(), spawn.z);
       const center = mapBounds.getCenter(new THREE.Vector3());
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
@@ -199,6 +215,16 @@ function loadMapSource(url, displayName, revokeUrl){
   });
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function buildLampLighting(model){
+  for(const light of generatedLampLights)light.parent?.remove(light);
+  generatedLampLights.length=0;
+  const b=new THREE.Box3().setFromObject(model);if(b.isEmpty())return;
+  const size=b.getSize(new THREE.Vector3());
+  const y=Math.min(b.max.y-1,Math.max(b.min.y+2.8,b.min.y+Math.min(6.2,size.y*.26)));
+  const placements=[{z:.12,x:.39,c:0xffd9a6,i:23},{z:.29,x:.61,c:0xffe4bc,i:21},{z:.46,x:.40,c:0xffd6a0,i:23},{z:.63,x:.60,c:0xffe4bc,i:21},{z:.80,x:.39,c:0xffd9a6,i:23},{z:.92,x:.61,c:0xffe4bc,i:19}];
+  for(const p of placements){const l=new THREE.PointLight(p.c,p.i,32,2);l.position.set(b.min.x+size.x*p.x,y,b.min.z+size.z*p.z);l.name='Zone9LampFill';scene.add(l);generatedLampLights.push(l);}
+  const fill=new THREE.AmbientLight(0xffe6ca,.22);scene.add(fill);generatedLampLights.push(fill);
+}
 function eyeHeight(){ return BASE_EYE_HEIGHT*playerScale; }
 function radius(){ return BASE_RADIUS*playerScale; }
 function normalY(hit){
@@ -264,40 +290,77 @@ function tryMoveTo(x,z,fromX,fromZ,dist){
   floorY=y+0.015; camera.position.set(x,floorY+eyeHeight(),z); return true;
 }
 function movePlayer(dt){
-  if(!controls.isLocked || !hasMap) return;
-  let f=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0);
-  let r=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);
-  if(!f&&!r)return;
-  const forward=new THREE.Vector3(); camera.getWorldDirection(forward); forward.y=0; forward.normalize();
-  const right=new THREE.Vector3(-forward.z,0,forward.x);
-  const dir=forward.multiplyScalar(f).add(right.multiplyScalar(r)).normalize();
-  const speed=(keys.has('ShiftLeft')||keys.has('ShiftRight'))?RUN_SPEED:WALK_SPEED;
-  const dx=dir.x*speed*dt, dz=dir.z*speed*dt;
-  if(Math.abs(dx)<1e-8&&Math.abs(dz)<1e-8)return;
-  const x=camera.position.x,z=camera.position.z;
-  const dist=Math.hypot(dx,dz);
-  if(!tryMoveTo(x+dx,z+dz,x,z,dist)){
-    // Axis-separated fallback lets the player slide alongside walls.
-    if(Math.abs(dx)>1e-5) tryMoveTo(x+dx,z,x,z,Math.abs(dx));
-    const x2=camera.position.x,z2=camera.position.z;
-    if(Math.abs(dz)>1e-5) tryMoveTo(x2,z+dz,x2,z,Math.abs(dz));
+  if(!controls.isLocked||!hasMap)return;
+  const f=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0);
+  const r=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);
+  const run=keys.has('ShiftLeft')||keys.has('ShiftRight');
+  const speed=(run?RUN_SPEED:WALK_SPEED)*speedMultiplier*(noclipEnabled?1.35:1);
+  const viewDir=new THREE.Vector3();camera.getWorldDirection(viewDir);
+  const horizontal=viewDir.clone();horizontal.y=0;horizontal.normalize();
+  const right=new THREE.Vector3(-horizontal.z,0,horizontal.x);
+  if(noclipEnabled){
+    const wish=new THREE.Vector3();wish.addScaledVector(viewDir,f);wish.addScaledVector(right,r);
+    if(keys.has('Space'))wish.y+=1;
+    if(keys.has('ControlLeft')||keys.has('ControlRight'))wish.y-=1;
+    if(wish.lengthSq()>0){wish.normalize();camera.position.addScaledVector(wish,speed*dt);}
+    floorY=camera.position.y-eyeHeight();isGrounded=false;refreshCoordFields();return;
   }
+  const wish=horizontal.multiplyScalar(f).add(right.multiplyScalar(r));
+  let dx=0,dz=0;if(wish.lengthSq()>0){wish.normalize();dx=wish.x*speed*dt;dz=wish.z*speed*dt;}
+  if(isGrounded){
+    if(jumpQueued){verticalVelocity=7.2*playerScale;isGrounded=false;jumpQueued=false;}
+    if(isGrounded&&(Math.abs(dx)>1e-8||Math.abs(dz)>1e-8)){
+      const x=camera.position.x,z=camera.position.z,dist=Math.hypot(dx,dz);
+      if(!tryMoveTo(x+dx,z+dz,x,z,dist)){
+        if(Math.abs(dx)>1e-5)tryMoveTo(x+dx,z,x,z,Math.abs(dx));
+        const x2=camera.position.x,z2=camera.position.z;
+        if(Math.abs(dz)>1e-5)tryMoveTo(x2,z2+dz,x2,z,Math.abs(dz));
+      }
+    }
+    if(isGrounded)return;
+  }else if(Math.abs(dx)>1e-8||Math.abs(dz)>1e-8){
+    const x=camera.position.x,z=camera.position.z,dist=Math.hypot(dx,dz);
+    if(!wallBlocked(x,z,x+dx,z+dz,floorY,dist)){camera.position.x+=dx;camera.position.z+=dz;}
+    else{
+      if(Math.abs(dx)>1e-5&&!wallBlocked(x,z,x+dx,z,floorY,Math.abs(dx)))camera.position.x+=dx;
+      const x2=camera.position.x,z2=camera.position.z;
+      if(Math.abs(dz)>1e-5&&!wallBlocked(x2,z2,x2,z2+dz,floorY,Math.abs(dz)))camera.position.z+=dz;
+    }
+  }
+  const previousFeet=camera.position.y-eyeHeight();
+  verticalVelocity-=19.5*dt;
+  let nextFeet=previousFeet+verticalVelocity*dt;
+  if(verticalVelocity<=0){
+    const ground=findFloorAt(camera.position.x,camera.position.z,mapBounds.max.y+2,Math.max(300,mapBounds.getSize(new THREE.Vector3()).y+300));
+    if(ground!==null&&nextFeet<=ground+0.05){nextFeet=ground+0.035;verticalVelocity=0;isGrounded=true;}
+  }
+  floorY=nextFeet;camera.position.y=floorY+eyeHeight();refreshCoordFields();
 }
+function configureCoordinateRanges(){
+  const size=mapBounds.getSize(new THREE.Vector3());
+  const spec={X:[mapBounds.min.x-Math.max(10,size.x*.08),mapBounds.max.x+Math.max(10,size.x*.08)],Y:[mapBounds.min.y-Math.max(5,size.y*.12),mapBounds.max.y+Math.max(15,size.y*.25)],Z:[mapBounds.min.z-Math.max(10,size.z*.08),mapBounds.max.z+Math.max(10,size.z*.08)]};
+  for(const axis of ['X','Y','Z']){const el=$(axis.toLowerCase()+'Range'),v=spec[axis],span=Math.max(10,v[1]-v[0]);el.min=String(v[0]);el.max=String(v[1]);el.step=String(Math.max(.05,span/2000));}
+}
+function updateAxisLabel(axis,val){$(axis.toLowerCase()+'Value').textContent=Number(val).toFixed(2);}
+function syncRangeFromField(axis){const val=Number($('pos'+axis).value);if(!Number.isFinite(val))return;const el=$(axis.toLowerCase()+'Range');el.value=String(Math.min(Number(el.max),Math.max(Number(el.min),val)));updateAxisLabel(axis,val);$('coordFeedback').textContent='';}
+function applyAxisSlider(axis){const val=Number($(axis.toLowerCase()+'Range').value);$('pos'+axis).value=val.toFixed(2);updateAxisLabel(axis,val);if(hasMap)applyCoordinates(true);}
 function refreshCoordFields(force=false){
   if(!hasMap)return;
-  const fields=[['posX',camera.position.x],['posY',floorY],['posZ',camera.position.z]];
-  for(const [id,val] of fields){ const el=$(id); if(force||document.activeElement!==el) el.value=Number(val).toFixed(2); }
+  const fields=[['X',camera.position.x],['Y',camera.position.y-eyeHeight()],['Z',camera.position.z]];
+  for(const [axis,val]of fields){const el=$('pos'+axis),range=$(axis.toLowerCase()+'Range');if(force||document.activeElement!==el)el.value=Number(val).toFixed(2);if(force||document.activeElement!==range)range.value=String(Math.min(Number(range.max),Math.max(Number(range.min),val)));updateAxisLabel(axis,val);}
 }
-function applyCoordinates(){
+function applyCoordinates(fromSlider=false){
   if(!hasMap)return;
-  const x=Number($('posX').value), y=Number($('posY').value), z=Number($('posZ').value);
-  if(![x,y,z].every(Number.isFinite))return;
-  camera.position.set(x,y+eyeHeight(),z); floorY=y; refreshCoordFields(true);
+  const x=Number($('posX').value),y=Number($('posY').value),z=Number($('posZ').value);
+  if(![x,y,z].every(Number.isFinite)){$('coordFeedback').textContent='Введи коректні числа для X, Y і Z.';return;}
+  camera.position.set(x,y+eyeHeight(),z);floorY=y;verticalVelocity=0;isGrounded=false;
+  if(!noclipEnabled){const surface=findFloorAt(x,z,mapBounds.max.y+2,Math.max(300,mapBounds.getSize(new THREE.Vector3()).y+300));if(surface!==null&&Math.abs(y-surface)<STEP_UP*playerScale+.3){floorY=surface+.035;camera.position.y=floorY+eyeHeight();isGrounded=true;}}
+  refreshCoordFields(true);$('coordFeedback').textContent=fromSlider?'Позицію змінено.':'Координати застосовано.';
 }
 function returnToSpawn(){
   if(!hasMap || !spawnPoint) return;
-  floorY = spawnPoint.y;
-  camera.position.set(spawnPoint.x, floorY + eyeHeight(), spawnPoint.z);
+  floorY=spawnPoint.y;verticalVelocity=0;isGrounded=true;
+  camera.position.set(spawnPoint.x,floorY+eyeHeight(),spawnPoint.z);
   const center = mapBounds.getCenter(new THREE.Vector3());
   const dx = center.x - spawnPoint.x, dz = center.z - spawnPoint.z;
   camera.rotation.order='YXZ';
@@ -307,7 +370,7 @@ function returnToSpawn(){
 function dropToSurface(){
   if(!hasMap)return;
   const y=findFloorAt(camera.position.x,camera.position.z,mapBounds.max.y+Math.max(50,mapBounds.getSize(new THREE.Vector3()).y),Math.max(200,mapBounds.getSize(new THREE.Vector3()).y+150));
-  if(y!==null){floorY=y+0.035;camera.position.y=floorY+eyeHeight();refreshCoordFields(true);}
+  if(y!==null){floorY=y+0.035;camera.position.y=floorY+eyeHeight();verticalVelocity=0;isGrounded=true;refreshCoordFields(true);}
 }
 function animate(now=performance.now()){
   requestAnimationFrame(animate);
