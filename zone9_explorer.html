@@ -269,6 +269,7 @@ function translateInterface(){
  $('selectedModeName').textContent=names[selectedMode]||names.team_fight;
  $('startGameBtn').textContent=tr('▶　Играть')==='▶　Играть'?'▶　Грати':tr('▶　Играть');
  $('languageSelect').value=lang();
+ if($('languageSelectMatch'))$('languageSelectMatch').value=lang();
 }
 function init(){
   scene = new THREE.Scene(); scene.background = new THREE.Color(0x9da8b4);
@@ -310,7 +311,7 @@ function init(){
   if(savedMode&&modeNames[savedMode]){
     selectedMode=savedMode;
     const savedButton=document.querySelector('[data-mode="'+savedMode+'"]');
-    if(savedButton){document.querySelectorAll('[data-mode]').forEach(other=>{const on=other===savedButton;other.classList.toggle('selected',on);other.setAttribute('aria-pressed',String(on))});$('selectedModeName').textContent=modeNames[savedMode];}
+    if(savedButton){document.querySelectorAll('[data-mode]').forEach(other=>{const on=other===savedButton;other.classList.toggle('selected',on);other.setAttribute('aria-pressed',String(on))});$('selectedModeName').textContent=tr(modeNames[savedMode]);}
   }
   $('generalModesTab').addEventListener('click',()=>{$('generalModes').classList.remove('hidden');$('otherModes').classList.add('hidden');$('generalModesTab').classList.add('active');$('otherModesTab').classList.remove('active');$('generalModesTab').setAttribute('aria-selected','true');$('otherModesTab').setAttribute('aria-selected','false')});
   $('otherModesTab').addEventListener('click',()=>{$('generalModes').classList.add('hidden');$('otherModes').classList.remove('hidden');$('generalModesTab').classList.remove('active');$('otherModesTab').classList.add('active');$('generalModesTab').setAttribute('aria-selected','false');$('otherModesTab').setAttribute('aria-selected','true')});
@@ -600,6 +601,10 @@ function loadMapSource(url, displayName, revokeUrl){
     console.warn('Не вдалося автоматично завантажити '+displayName+':', err);
     if(revokeUrl) URL.revokeObjectURL(url);
     $('chooseBtn').disabled=false; if($('startGameBtn'))$('startGameBtn').disabled=false;
+    if(!revokeUrl && url==='https://raw.githubusercontent.com/standoffX/zone9prototype/main/zone9.glb'){
+      console.warn('Raw download failed; retrying the local Zone 9 asset.');
+      loadMapSource('./zone9.glb',displayName,false);return;
+    }
     if(!revokeUrl && location.protocol === 'file:') {
       setStatus('Браузер не дозволив відкрити сусідній файл напряму. Запусти локальний сервер або вибери GLB вручну.',true);
     } else {
@@ -683,7 +688,7 @@ function tryMoveTo(x,z,fromX,fromZ,dist){
   floorY=y+0.015; camera.position.set(x,floorY+eyeHeight(),z); return true;
 }
 function movePlayer(dt){
-  if((!controls.isLocked&&!(matchMedia('(pointer:coarse)').matches&&keys.size>0))||!hasMap||pauseOpen)return;
+  if((!controls.isLocked&&!(matchMedia('(pointer:coarse)').matches&&(keys.size>0||jumpQueued)))||!hasMap||pauseOpen)return;
   const f=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0);
   const r=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0);
   const run=keys.has('ShiftLeft')||keys.has('ShiftRight');
