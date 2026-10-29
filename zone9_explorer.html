@@ -41,7 +41,7 @@
 .map-section{margin-top:25px}.map-option{background:linear-gradient(105deg,#1a3455,#17243b);border:1px solid #6bffb06b;border-radius:11px;padding:14px 16px}.map-option .map-num{color:#6bffb0}.map-option strong{font-size:19px}.lobby-actions{margin-top:22px;gap:18px}.mode-summary span{color:#8ebaff}.mode-summary b{font-size:15px}.file-button{min-height:52px;border-radius:10px;background:linear-gradient(110deg,#70ffb4,#46d7b3);color:#071b20;box-shadow:0 8px 26px #46e8b325;font-size:14px;padding:0 25px}.file-button:hover{filter:brightness(1.08);transform:translateY(-2px)}
 .event-card{position:relative;overflow:hidden;min-height:215px;padding:17px;background:linear-gradient(145deg,#294d83,#272d62 60%,#1a2240);border:1px solid #95baff35;border-radius:13px;box-shadow:0 12px 30px #0002}.event-card:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-55px;top:48px;background:radial-gradient(circle,#5bb6ff42,transparent 70%)}.event-card small{color:#74ffc2}.event-card b{font-size:19px;letter-spacing:.4px}.event-card p{color:#c0cce0}.map-preview{height:105px;background:linear-gradient(135deg,#4e9c9b,#284c72 48%,#342e6d);border:1px solid #ffffff20;border-radius:9px;color:#fff;position:relative;z-index:1}.map-preview strong{font-size:38px}
 #menuSettings{background:#101b2e;border:1px solid #7eaaff3b;border-radius:12px}#menuSettings label{color:#d7e4f7}#menuSettings input{accent-color:#6bffb0}
-#chooseBtn,#status,.load-help,.squad-empty,.left-foot,.event-card.subdued,.map-option small,#menuSettings p{display:none!important}
+#chooseBtn,#status,.load-help,.squad-empty,.left-foot,.event-card.subdued,.map-option small,#menuSettings p{display:none!important}#status:has(#error){display:block!important;background:#351b28;border:1px solid #ff647755;border-radius:8px;padding:10px;color:#ffd1d9}
 #hud .hud-chip{background:#0b1324d9;border-color:#79aaff30}#panel{background:#101b2cF2;border-color:#79aaff38}#panel .btn{border-radius:8px}
 #languageSelect{background:#172b49;color:#eff6ff;border:1px solid #80b7ff55;border-radius:8px;padding:8px 9px;font-weight:800;max-width:105px;outline:none}
 @media(max-width:1050px){.lobby-layout{grid-template-columns:195px minmax(0,1fr)}.lobby-right{display:none}}
@@ -163,7 +163,7 @@ function init(){
   document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{
     selectedMode=btn.dataset.mode;
     document.querySelectorAll('[data-mode]').forEach(other=>{const on=other===btn;other.classList.toggle('selected',on);other.setAttribute('aria-pressed',String(on))});
-    $('selectedModeName').textContent=modeNames[selectedMode];
+    $('selectedModeName').textContent=tr(modeNames[selectedMode]);
     localStorage.setItem('zone9-mode',selectedMode);
     setStatus('Выбран режим: '+modeNames[selectedMode]+'. Карта: Zone 9.');
   }));
