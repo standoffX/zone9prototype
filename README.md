@@ -1,9 +1,12 @@
-# Zone 9 Explorer v7
+# Zone 9 Prototype — Lobby + Map Explorer
 
-Standalone first-person map explorer for Zone 9. This is a separate project and does not modify StandoffX.
+Standalone Zone 9 first-person prototype with a Standoff 2 Remastered-inspired lobby/mode selector. This is a separate project and does not modify `standoffX/StandoffX`.
 
 ## Current status
-- Zone 9 is the only selectable map. Province is temporarily hidden until its geometry can be rebuilt.
+- Zone 9 is the only selectable map; Province and other maps are not shown.
+- The menu has mode groups inspired by the new Standoff 2 interface: General (Team Fight, Allies) and Others (Training).
+- Mode selection is saved locally in the browser. At this stage the buttons select a mode for the prototype UI; online matchmaking and full Team Fight/Allies rules are not connected in this repository yet.
+- Settings are opened/closed from the top-right gear; the menu is responsive on mobile.
 - The placeholder procedural knife has been removed because it did not meet the requested visual quality.
 - A proper knife animation can be integrated after the matching Unity animation, rig/model and hand/weapon assets are supplied. A `.anim` file alone may not be sufficient if its bone paths or Avatar refer to a specific rig.
 
