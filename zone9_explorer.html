@@ -81,7 +81,7 @@ let spawnPoint = null, mapScaleFactor = 1, speedMultiplier = 1;
 const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
-let selectedMapKey = 'zone9';
+let selectedMapKey = 'zone9', selectedMode = 'team_fight';
 const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'./zone9.glb'} };
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
@@ -111,7 +111,6 @@ function init(){
   window.addEventListener('keyup', e => keys.delete(e.code));
   window.addEventListener('blur', () => keys.clear());
   $('selectZone9').addEventListener('click', () => selectMap('zone9'));
-  let selectedMode='team_fight';
   const modeNames={team_fight:'Командный бой',allies:'Союзники',training:'Тренировка'};
   document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{
     selectedMode=btn.dataset.mode;
