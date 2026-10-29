@@ -228,7 +228,7 @@ const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
 let selectedMapKey = 'zone9', selectedMode = 'team_fight';
-let pauseOpen=false, returningToMenu=false, layoutEditing=false, currentTeam=localStorage.getItem('zone9-team')||'CT', matchSecondsElapsed=0;
+let pauseOpen=false, returningToMenu=false, showingLobby=true, layoutEditing=false, currentTeam=localStorage.getItem('zone9-team')||'CT', matchSecondsElapsed=0;
 const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'https://raw.githubusercontent.com/standoffX/zone9prototype/main/zone9.glb'} };
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
@@ -283,7 +283,7 @@ function init(){
   const sun = new THREE.DirectionalLight(0xffffff, 2.0); sun.position.set(80,140,60); scene.add(sun);
   mapRoot = new THREE.Group(); scene.add(mapRoot);
   controls.addEventListener('lock', () => document.body.classList.add('locked'));
-  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); if(hasMap&&!returningToMenu&&!pauseOpen) showPause(); });
+  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); if(hasMap&&!showingLobby&&!returningToMenu&&!pauseOpen) showPause(); });
   renderer.domElement.addEventListener('click', () => { if(hasMap && !controls.isLocked && !isUiFocused() && matchMedia('(pointer:fine)').matches) controls.lock(); });
   let touchLook=null;
   renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&hasMap){touchLook={id:e.pointerId,x:e.clientX,y:e.clientY};}});
@@ -376,7 +376,7 @@ function initMatchUi(){
   applyHudSettings();applySensitivity();applyGraphicsSetting();updateTeamUi();
 }
 function showPause(){
-  if(!hasMap)return;
+  if(!hasMap||showingLobby)return;
   pauseOpen=true;keys.clear();document.body.classList.add('pause-open');
   $('pauseSettings').classList.remove('visible');$('pauseHome').classList.remove('hidden');
   $('pauseOverlay').classList.add('visible');
@@ -389,7 +389,7 @@ function resumeMatch(){
   if(controls&&!controls.isLocked)controls.lock();
 }
 function returnToLobby(){
-  returningToMenu=true;pauseOpen=false;layoutEditing=false;keys.clear();
+  returningToMenu=true;showingLobby=true;pauseOpen=false;layoutEditing=false;keys.clear();
   document.body.classList.remove('in-match','pause-open','layout-edit','hud-disabled','hud-minimal');
   $('pauseOverlay').classList.remove('visible');$('panel').classList.add('hidden');$('showPanel').classList.remove('visible');
   if(controls?.isLocked)controls.unlock();
@@ -503,7 +503,7 @@ function updateHudClock(){
 
 function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
 function onKeyDown(e){
-  if(e.code==='Escape'&&!e.repeat){e.preventDefault();if(hasMap){if(pauseOpen)resumeMatch();else showPause();}return;}
+  if(e.code==='Escape'&&!e.repeat){e.preventDefault();if(hasMap&&!showingLobby){if(pauseOpen)resumeMatch();else showPause();}return;}
   if(e.code==='KeyG'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();togglePanel();return;}
   if(e.code==='KeyN'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();toggleNoclip();return;}
   if(e.code==='Space'&&!e.repeat){e.preventDefault();if(noclipEnabled)keys.add(e.code);else if(controls?.isLocked&&isGrounded)jumpQueued=true;return;}
@@ -584,7 +584,7 @@ function loadMapSource(url, displayName, revokeUrl){
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
       const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
       camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
-      hasMap=true; matchSecondsElapsed=0; document.body.classList.add('in-match'); document.body.classList.remove('hud-disabled','hud-minimal','layout-edit'); pauseOpen=false; $('pauseOverlay').classList.remove('visible'); $('panel').classList.add('hidden'); $('showPanel').classList.remove('visible'); applyHudSettings(); restoreHudLayout(); updateTeamUi(); $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
+      hasMap=true; showingLobby=false; matchSecondsElapsed=0; document.body.classList.add('in-match'); document.body.classList.remove('hud-disabled','hud-minimal','layout-edit'); pauseOpen=false; $('pauseOverlay').classList.remove('visible'); $('panel').classList.add('hidden'); $('showPanel').classList.remove('visible'); applyHudSettings(); restoreHudLayout(); updateTeamUi(); $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
       $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
       console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
     }catch(err){
