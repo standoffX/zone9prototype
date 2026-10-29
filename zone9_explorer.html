@@ -60,6 +60,37 @@
 @media(max-width:1050px){.lobby-layout{grid-template-columns:195px minmax(0,1fr)}.lobby-right{display:none}}
 @media(max-width:620px){.agent-stage{right:-35px;top:10%;transform:scale(.72);transform-origin:top right;opacity:.19}#loader{padding:0;background:#09111f}.load-card{border-radius:0;min-height:100dvh}.lobby-head{height:58px;padding:0 12px}.brand{font-size:12px;letter-spacing:1.5px}.lobby-account{gap:7px;font-size:11px}#languageSelect{max-width:82px;padding:7px 4px;font-size:10px}.lobby-layout{display:block}.lobby-main{padding:22px 15px}.load-title{font-size:32px}.mode-grid{grid-template-columns:1fr}.mode-card{min-height:78px}.lobby-actions{flex-direction:row;align-items:center}.lobby-actions .file-button{width:auto;min-width:128px;padding:0 15px}.mode-summary b{font-size:13px}.map-section{margin-top:20px}}
 
+
+/* Match HUD: monochrome, compact, customizable */
+:root{--match-hud-scale:1;--match-hud-opacity:.88;--hud-ink:#d7dbe0;--hud-panel:rgba(15,18,23,var(--match-hud-opacity))}
+.match-hud{display:none;position:fixed;inset:0;z-index:12;pointer-events:none;color:var(--hud-ink);font-family:Nunito,Inter,system-ui,sans-serif}
+body.in-match .match-hud{display:block}
+body.hud-disabled .match-hud{display:none!important}
+.hud-widget{position:fixed;pointer-events:auto;touch-action:none;user-select:none;color:#e0e3e7;background:var(--hud-panel);border:1px solid #aeb6c12a;box-shadow:0 5px 20px #0003;backdrop-filter:blur(9px);transform:scale(var(--match-hud-scale));transform-origin:top left;border-radius:8px}
+.hud-score{top:14px;left:50%;transform:translateX(-50%) scale(var(--match-hud-scale));transform-origin:top center;display:flex;align-items:center;gap:0;min-width:265px;justify-content:center;padding:8px 12px}
+.hud-team{display:flex;align-items:center;gap:8px;font-weight:900;font-size:12px;letter-spacing:.6px;padding:0 12px}.hud-team strong{font-size:19px;font-variant-numeric:tabular-nums;color:#f1f3f5}.hud-separator{height:22px;width:1px;background:#aeb6c12e}.hud-clock{min-width:72px;text-align:center;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;color:#f1f3f5}
+.hud-icon-btn{display:grid;place-items:center;border:1px solid #9da5af3a;background:rgba(16,19,24,.82);color:#cdd2d8;border-radius:8px;width:46px;height:46px;cursor:pointer;pointer-events:auto;box-shadow:0 6px 18px #0003;touch-action:none}
+.hud-icon-btn svg,.touch-btn svg,.hud-stat svg,.pause-option svg,.team-choice svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
+.hud-icon-btn:hover,.touch-btn:hover{background:#32373e;color:#fff}
+.hud-pause{top:15px;right:16px;width:43px;height:43px}
+.hud-vitals{left:18px;bottom:20px;padding:10px 13px;min-width:190px;display:flex;gap:15px;align-items:center}
+.hud-stat{display:flex;align-items:center;gap:8px;min-width:0}.hud-stat svg{color:#c3c9d0;width:24px;height:24px;flex-shrink:0}.hud-stat-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.hud-stat-copy small{font-size:9px;font-weight:900;letter-spacing:1px;color:#a1a8b1}.hud-stat-copy strong{font-size:19px;line-height:1;font-variant-numeric:tabular-nums;color:#f4f5f6}.hud-stat-copy strong span{font-size:10px;color:#a9b0b8}
+.hud-ammo{right:18px;bottom:20px;min-width:200px;padding:11px 14px;display:flex;align-items:center;gap:12px}.hud-weapon-icon{width:70px;height:36px;color:#bdc4cc;display:grid;place-items:center;border-right:1px solid #aeb6c12e;padding-right:9px}.hud-weapon-icon svg{width:65px;height:32px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.hud-ammo-copy{display:flex;flex-direction:column;gap:4px}.hud-ammo-copy small{font-size:9px;letter-spacing:1.2px;color:#a1a8b1;font-weight:900}.hud-ammo-copy strong{font-size:21px;letter-spacing:.5px;font-variant-numeric:tabular-nums;color:#f3f5f6}.hud-ammo-copy strong span{color:#a5acb5;font-size:13px}
+.hud-crosshair{position:fixed;left:50%;top:50%;width:14px;height:14px;transform:translate(-50%,-50%);pointer-events:none;opacity:.8}.hud-crosshair:before,.hud-crosshair:after{content:"";position:absolute;background:#e3e6e9;box-shadow:0 0 2px #000}.hud-crosshair:before{width:12px;height:1.5px;left:1px;top:6px}.hud-crosshair:after{height:12px;width:1.5px;left:6px;top:1px}
+#touchControls{display:none;position:fixed;inset:0;pointer-events:none;touch-action:none}
+.touch-cluster{position:fixed;display:flex;gap:9px;align-items:center;pointer-events:auto}.touch-left{left:16px;bottom:105px;flex-direction:column}.touch-right{right:18px;bottom:95px;align-items:flex-end;flex-direction:column}.touch-row{display:flex;gap:8px}.touch-btn{width:54px;height:54px;display:grid;place-items:center;border:1px solid #b3bbc525;background:rgba(15,18,23,.66);color:#d1d5da;border-radius:50%;backdrop-filter:blur(5px);touch-action:none;user-select:none}.touch-btn svg{width:25px;height:25px}.touch-btn.fire{width:68px;height:68px;background:rgba(19,22,28,.72);border:1px solid #d3d8df47}
+#pauseOverlay{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,6,10,.73);backdrop-filter:blur(7px);color:#e5e8ec;font-family:Nunito,Inter,system-ui,sans-serif}
+#pauseOverlay.visible{display:flex}.pause-card{width:min(560px,100%);max-height:min(90dvh,780px);overflow:auto;background:linear-gradient(145deg,#20242a,#111418);border:1px solid #ffffff20;border-radius:13px;box-shadow:0 28px 100px #0009;padding:20px}
+.pause-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff17;padding-bottom:15px;margin-bottom:17px}.pause-head h2{margin:0;font-size:22px;letter-spacing:1.5px;font-weight:1000;color:#f1f3f5}.pause-head small{display:block;margin-top:5px;color:#858d97;font-size:10px;letter-spacing:1.6px;font-weight:900}.pause-close{width:38px;height:38px;border-radius:8px;border:1px solid #ffffff19;background:#2a2f36;color:#dce0e5;font-size:22px;cursor:pointer}
+.pause-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pause-option{display:flex;align-items:center;gap:13px;min-height:63px;padding:11px 13px;background:#272c32;border:1px solid #ffffff10;color:#e5e8ec;border-radius:8px;text-align:left;font-size:13px;font-weight:850;cursor:pointer}.pause-option:hover{background:#333941;border-color:#ffffff2e}.pause-option svg{color:#c3c8cf;flex-shrink:0}.pause-option.wide{grid-column:1/-1}.pause-option.danger{color:#d6d9de;background:#202328}.pause-option span small{display:block;margin-top:4px;font-size:10px;color:#9198a1;font-weight:650}
+.pause-subhead{font-size:10px;font-weight:950;letter-spacing:1.5px;color:#9199a3;margin:18px 0 9px}.team-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.team-choice{display:flex;align-items:center;gap:10px;padding:13px;background:#252a30;color:#d9dde2;border:1px solid #ffffff17;border-radius:8px;text-align:left;cursor:pointer}.team-choice svg{color:#afb6be;flex-shrink:0}.team-choice b{font-size:13px}.team-choice small{display:block;color:#8d959f;font-size:10px;margin-top:3px}.team-choice.selected{border-color:#aab2bc;background:#343a42;box-shadow:inset 0 0 0 1px #fff1}
+.pause-settings{display:none}.pause-settings.visible{display:block}.pause-home.hidden{display:none}.pause-back{margin-top:16px;border:1px solid #ffffff16;background:#24282e;border-radius:8px;color:#d4d9df;padding:10px 13px;font-weight:850;cursor:pointer}
+.settings-tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid #ffffff16}.settings-tab{flex:1;border:0;border-bottom:2px solid transparent;background:transparent;color:#929aa4;padding:11px 5px;font-size:11px;font-weight:900;cursor:pointer}.settings-tab.active{color:#f0f2f5;border-color:#c1c7cf}
+.setting-line{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:15px 0;color:#dce0e5;font-size:12px;font-weight:750}.setting-line output{color:#adb4bc;font-variant-numeric:tabular-nums}.setting-line input[type=range]{max-width:46%;accent-color:#bbc2ca}.setting-line select{max-width:48%;background:#242930;color:#e2e6eb;border:1px solid #ffffff25;border-radius:6px;padding:8px;font-size:11px}.setting-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.setting-actions button{border:1px solid #ffffff20;background:#292e34;color:#d7dce2;border-radius:7px;padding:10px 12px;font-size:11px;font-weight:850;cursor:pointer}.setting-actions .active{background:#41474f;border-color:#a6adb6}
+body.layout-edit .hud-widget{outline:1px dashed #c8ced655;cursor:move}body.layout-edit .hud-widget:after{content:"⠿";position:absolute;right:4px;top:2px;color:#d7dbe0;font-size:13px}
+@media(max-width:700px){.hud-score{top:8px;min-width:205px;padding:6px}.hud-team{font-size:10px;padding:0 8px;gap:5px}.hud-team strong{font-size:15px}.hud-clock{font-size:14px;min-width:57px}.hud-pause{top:8px;right:8px;width:37px;height:37px}.hud-vitals{left:9px;bottom:10px;min-width:0;padding:8px;gap:10px}.hud-stat svg{width:20px;height:20px}.hud-stat-copy strong{font-size:16px}.hud-ammo{right:9px;bottom:10px;min-width:0;padding:8px;gap:7px}.hud-weapon-icon{width:45px;padding-right:5px}.hud-weapon-icon svg{width:44px}.hud-ammo-copy strong{font-size:17px}.hud-ammo-copy strong span{font-size:11px}.touch-cluster{bottom:95px}.touch-left{left:9px}.touch-right{right:9px}.touch-btn{width:46px;height:46px}.touch-btn.fire{width:58px;height:58px}.pause-card{padding:15px;border-radius:10px}.pause-head h2{font-size:19px}.pause-grid{grid-template-columns:1fr}.pause-option.wide{grid-column:auto}.pause-option{min-height:54px}.setting-line{flex-wrap:wrap}.setting-line input[type=range],.setting-line select{max-width:100%;width:100%}}
+@media(pointer:coarse){#touchControls{display:block}}
+
 </style>
 </head>
 <body>
@@ -84,6 +115,66 @@
 </div>
 <button id="showPanel" type="button">ПАРАМЕТРИ · G</button>
 <div id="crosshair"></div>
+
+<div id="matchHud" class="match-hud" aria-label="Match HUD">
+ <div id="scoreWidget" class="hud-widget hud-score" data-layout-item="score">
+  <div class="hud-team"><span id="leftTeamName">CT</span><strong id="ctScore">0</strong></div><div class="hud-separator"></div><div id="roundClock" class="hud-clock">01:30</div><div class="hud-separator"></div><div class="hud-team"><strong id="tScore">0</strong><span id="rightTeamName">T</span></div>
+ </div>
+ <button id="hudPauseBtn" class="hud-widget hud-icon-btn hud-pause" data-layout-item="pause" type="button" aria-label="Pause" title="Pause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+ <div id="vitalsWidget" class="hud-widget hud-vitals" data-layout-item="vitals">
+  <div class="hud-stat"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2 4.5 4.5 0 0 1 8 2c0 6.5-8 11-8 11Z"/><path d="M12 8v7M8.5 11.5h7"/></svg><div class="hud-stat-copy"><small>HP</small><strong id="healthValue">100</strong></div></div>
+  <div class="hud-stat"><svg viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="hud-stat-copy"><small>ARMOR</small><strong id="armorValue">100</strong></div></div>
+ </div>
+ <div id="ammoWidget" class="hud-widget hud-ammo" data-layout-item="ammo">
+  <div class="hud-weapon-icon"><svg viewBox="0 0 100 42"><path d="M7 12h17l6 5h23l7 4h22l8 5H64l-6-4H37l-7-4H7z"/><path d="M34 22v11h11l6-11M16 12V7h20l8 5M69 26v5h7"/></svg></div><div class="hud-ammo-copy"><small id="weaponLabel">AKR</small><strong><span id="ammoValue">30</span> <span>/</span> <span id="reserveValue">90</span></strong></div>
+ </div>
+ <div class="hud-crosshair" id="hudCrosshair"></div>
+ <div id="touchControls" aria-label="Touch controls">
+  <div class="touch-cluster touch-left" data-layout-item="move"><div class="touch-row"><button class="touch-btn" data-key="KeyW" aria-label="Move forward"><svg viewBox="0 0 24 24"><path d="m6 14 6-6 6 6"/></svg></button></div><div class="touch-row"><button class="touch-btn" data-key="KeyA" aria-label="Move left"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></svg></button><button class="touch-btn" data-key="KeyS" aria-label="Move back"><svg viewBox="0 0 24 24"><path d="m6 10 6 6 6-6"/></svg></button><button class="touch-btn" data-key="KeyD" aria-label="Move right"><svg viewBox="0 0 24 24"><path d="m10 6 6 6-6 6"/></svg></button></div></div>
+  <div class="touch-cluster touch-right" data-layout-item="actions"><div class="touch-row"><button class="touch-btn" data-action="reload" aria-label="Reload"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 9a7 7 0 0 1 12-2l2 5M4 12l2 5a7 7 0 0 0 12-2"/></svg></button><button class="touch-btn" data-action="jump" aria-label="Jump"><svg viewBox="0 0 24 24"><path d="m5 14 7-7 7 7M12 7v12"/></svg></button></div><div class="touch-row"><button class="touch-btn fire" data-action="fire" aria-label="Fire"><svg viewBox="0 0 24 24"><path d="M7 4h10l-1 5 3 3-3 8H8l-3-8 3-3-1-5Z"/><path d="M9 4V2h6v2"/></svg></button><button class="touch-btn" data-action="crouch" aria-label="Crouch"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><path d="m6 11 5-2 5 3 3 5M11 9l-2 6-4 3M12 15l4 5"/></svg></button></div></div>
+ </div>
+</div>
+<div id="pauseOverlay" role="dialog" aria-modal="true" aria-label="Pause menu">
+ <div class="pause-card">
+  <div class="pause-head"><div><h2 id="pauseTitle">ПАУЗА</h2><small>ZONE 9 · MATCH</small></div><button class="pause-close" id="pauseCloseBtn" aria-label="Close">×</button></div>
+  <div id="pauseHome" class="pause-home">
+   <div class="pause-grid">
+    <button class="pause-option wide" id="resumeMatchBtn"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg><span>Продолжить матч<small>Вернуться в игру</small></span></button>
+    <button class="pause-option" id="openSettingsBtn"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19 13 2-1-2-1-.8-2 1-2-2-1-1.8 1-2-.5L12 4l-1 2.5-2 .5-1.8-1-2 1 1 2-.8 2-2 1 2 1 .8 2-1 2 2 1 1.8-1 2 .5L12 20l1-2.5 2-.5 1.8 1 2-1-1-2z"/></svg><span>Настройки<small>HUD и управление</small></span></button>
+    <button class="pause-option" id="layoutModeBtn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="1"/><rect x="14" y="4" width="7" height="4" rx="1"/><rect x="14" y="11" width="7" height="9" rx="1"/><rect x="3" y="14" width="8" height="6" rx="1"/></svg><span>Раскладка HUD<small>Переместить элементы</small></span></button>
+   </div>
+   <div class="pause-subhead">КОМАНДА</div>
+   <div class="team-choices">
+    <button class="team-choice" data-team="CT"><svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 4-3.2 7-8 9-4.8-2-8-5-8-9V7l8-4Z"/><path d="m8 12 2.5 2.5L16 9"/></svg><span><b>Спецназ · CT</b><small>Защитники</small></span></button>
+    <button class="team-choice" data-team="T"><svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 4-3.2 7-8 9-4.8-2-8-5-8-9V7l8-4Z"/><path d="M8 12h8M12 8v8"/></svg><span><b>Террористы · T</b><small>Атакующие</small></span></button>
+   </div>
+   <div class="setting-actions"><button id="backToLobbyBtn">Выйти в меню</button></div>
+  </div>
+  <div id="pauseSettings" class="pause-settings">
+   <div class="settings-tabs"><button class="settings-tab active" data-settings-tab="hud">HUD</button><button class="settings-tab" data-settings-tab="controls">Управление</button><button class="settings-tab" data-settings-tab="game">Игра</button></div>
+   <div id="settingsHudPane">
+    <label class="setting-line"><span>Размер интерфейса</span><output id="hudScaleOut">100%</output><input id="hudScaleRange" type="range" min="70" max="140" step="5" value="100"></label>
+    <label class="setting-line"><span>Прозрачность</span><output id="hudOpacityOut">88%</output><input id="hudOpacityRange" type="range" min="30" max="100" step="5" value="88"></label>
+    <label class="setting-line"><span>Отображение HUD</span><select id="hudVisibleSelect"><option value="all">Всё</option><option value="minimal">Минимум</option><option value="hidden">Скрыть</option></select></label>
+    <label class="setting-line"><span>Прицел</span><select id="crosshairSelect"><option value="cross">Крест</option><option value="dot">Точка</option><option value="none">Скрыть</option></select></label>
+    <label class="setting-line"><span>Набор раскладки</span><select id="layoutPresetSelect"><option value="standard">Стандартная</option><option value="left">Левша</option><option value="compact">Компактная</option></select></label>
+    <div class="setting-actions"><button id="editHudBtn">Перемещать элементы</button><button id="saveHudBtn">Сохранить раскладку</button><button id="resetHudBtn">Сбросить</button></div>
+   </div>
+   <div id="settingsControlsPane" class="hidden">
+    <div class="setting-line"><span>Движение</span><strong>W A S D / стрелки</strong></div>
+    <div class="setting-line"><span>Прыжок</span><strong>SPACE</strong></div><div class="setting-line"><span>Бег</span><strong>SHIFT</strong></div><div class="setting-line"><span>Пауза</span><strong>ESC</strong></div>
+    <div class="setting-line"><span>Чувствительность</span><output id="sensitivityOut">1.0×</output><input id="sensitivityRange" type="range" min="0.5" max="2.5" step="0.1" value="1"></div>
+   </div>
+   <div id="settingsGamePane" class="hidden">
+    <div class="setting-line"><span>Сторона</span><strong id="settingsTeamName">CT</strong></div>
+    <div class="setting-line"><span>Карта</span><strong>Zone 9</strong></div>
+    <div class="setting-line"><span>Качество графики</span><select id="matchGraphicsSelect"><option value="low">Низкое</option><option value="balanced">Среднее</option><option value="high">Высокое</option></select></div>
+   </div>
+   <button class="pause-back" id="settingsBackBtn">← Назад</button>
+  </div>
+ </div>
+</div>
+
 <div id="loader"><div class="load-card"><div class="lobby-head"><div class="brand">STANDOFFX <span>ZONE 9 PROTOTYPE</span></div><div class="lobby-account"><span class="account-dot"></span><span>SofterX</span><select id="languageSelect" aria-label="Language"><option value="uk">Українська</option><option value="ru">Русский</option><option value="en">English</option></select><button type="button" id="menuSettingsBtn" aria-label="Settings" title="Settings" aria-expanded="false">⚙</button></div></div>
 <div class="lobby-layout"><aside class="lobby-left"><div class="side-title">ЛОББИ</div><div class="lobby-user"><div class="avatar">S</div><div><b>SofterX</b><small>Лидер лобби</small></div></div><div class="side-title">КОМАНДА</div><div class="squad-slot"><span class="squad-avatar">S</span><div><b>SofterX</b><small>Ты · лидер</small></div><span class="online-mark"></span></div><div class="squad-empty">Приглашения друзей появятся после подключения сервера</div><div class="left-foot">ОДНА КАРТА · ZONE 9</div></aside>
 <main class="lobby-main"><div class="agent-stage" aria-hidden="true"><div class="agent-halo"></div><div class="agent-head"></div><div class="agent-body"></div><div class="agent-arm left"></div><div class="agent-arm right"></div><div class="agent-leg left"></div><div class="agent-leg right"></div><div class="agent-weapon"></div></div><div class="lobby-eyebrow">ВЫБОР РЕЖИМА</div><div class="load-title">Во что играем?</div><div class="load-desc">Выбери режим, затем нажми «Играть». Для прототипа доступна только одна карта — Zone 9.</div>
@@ -120,7 +211,7 @@ const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
 let selectedMapKey = 'zone9', selectedMode = 'team_fight';
-const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'./zone9.glb'} };
+const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'https://raw.githubusercontent.com/standoffX/zone9prototype/main/zone9.glb'} };
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
 const down = new THREE.Vector3(0,-1,0);
