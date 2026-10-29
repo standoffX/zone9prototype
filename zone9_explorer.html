@@ -91,6 +91,21 @@ body.layout-edit .hud-widget{outline:1px dashed #c8ced655;cursor:move}body.layou
 @media(max-width:700px){.hud-score{top:8px;min-width:205px;padding:6px}.hud-team{font-size:10px;padding:0 8px;gap:5px}.hud-team strong{font-size:15px}.hud-clock{font-size:14px;min-width:57px}.hud-pause{top:8px;right:8px;width:37px;height:37px}.hud-vitals{left:9px;bottom:10px;min-width:0;padding:8px;gap:10px}.hud-stat svg{width:20px;height:20px}.hud-stat-copy strong{font-size:16px}.hud-ammo{right:9px;bottom:10px;min-width:0;padding:8px;gap:7px}.hud-weapon-icon{width:45px;padding-right:5px}.hud-weapon-icon svg{width:44px}.hud-ammo-copy strong{font-size:17px}.hud-ammo-copy strong span{font-size:11px}.touch-cluster{bottom:95px}.touch-left{left:9px}.touch-right{right:9px}.touch-btn{width:46px;height:46px}.touch-btn.fire{width:58px;height:58px}.pause-card{padding:15px;border-radius:10px}.pause-head h2{font-size:19px}.pause-grid{grid-template-columns:1fr}.pause-option.wide{grid-column:auto}.pause-option{min-height:54px}.setting-line{flex-wrap:wrap}.setting-line input[type=range],.setting-line select{max-width:100%;width:100%}}
 @media(pointer:coarse){#touchControls{display:block}}
 
+
+body.in-match #hud,body.in-match #crosshair{display:none!important}
+body.in-match #panel.hidden,body.in-match #showPanel:not(.visible){display:none!important}
+body.hud-minimal #scoreWidget,body.hud-minimal #ammoWidget{display:none!important}
+.hud-crosshair.dot-only:before{width:3px;height:3px;border-radius:50%;left:5px;top:5px}
+.hud-crosshair.dot-only:after{display:none}
+body.hud-left-handed #vitalsWidget{left:auto;right:18px}
+body.hud-left-handed #ammoWidget{right:auto;left:18px}
+body.hud-left-handed .touch-left{left:auto;right:16px}
+body.hud-left-handed .touch-right{right:auto;left:16px}
+body.hud-compact .hud-widget{border-radius:6px}
+#layoutDoneBtn{display:none;position:fixed;z-index:50;left:50%;bottom:18px;transform:translateX(-50%);gap:10px;align-items:center;justify-content:center;padding:13px 22px;border:1px solid #ffffff35;border-radius:9px;background:#24292f;color:#eef1f4;font-size:12px;font-weight:950;box-shadow:0 8px 28px #0008;cursor:pointer}
+#layoutDoneBtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.layout-edit #layoutDoneBtn{display:flex}
+
 </style>
 </head>
 <body>
@@ -134,6 +149,7 @@ body.layout-edit .hud-widget{outline:1px dashed #c8ced655;cursor:move}body.layou
   <div class="touch-cluster touch-right" data-layout-item="actions"><div class="touch-row"><button class="touch-btn" data-action="reload" aria-label="Reload"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 9a7 7 0 0 1 12-2l2 5M4 12l2 5a7 7 0 0 0 12-2"/></svg></button><button class="touch-btn" data-action="jump" aria-label="Jump"><svg viewBox="0 0 24 24"><path d="m5 14 7-7 7 7M12 7v12"/></svg></button></div><div class="touch-row"><button class="touch-btn fire" data-action="fire" aria-label="Fire"><svg viewBox="0 0 24 24"><path d="M7 4h10l-1 5 3 3-3 8H8l-3-8 3-3-1-5Z"/><path d="M9 4V2h6v2"/></svg></button><button class="touch-btn" data-action="crouch" aria-label="Crouch"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><path d="m6 11 5-2 5 3 3 5M11 9l-2 6-4 3M12 15l4 5"/></svg></button></div></div>
  </div>
 </div>
+<button id="layoutDoneBtn" type="button"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg>Сохранить и выйти</button>
 <div id="pauseOverlay" role="dialog" aria-modal="true" aria-label="Pause menu">
  <div class="pause-card">
   <div class="pause-head"><div><h2 id="pauseTitle">ПАУЗА</h2><small>ZONE 9 · MATCH</small></div><button class="pause-close" id="pauseCloseBtn" aria-label="Close">×</button></div>
@@ -323,6 +339,7 @@ function initMatchUi(){
   $('crosshairSelect').addEventListener('change',e=>{localStorage.setItem('zone9-crosshair',e.target.value);applyHudSettings();});
   $('layoutPresetSelect').addEventListener('change',e=>{localStorage.setItem('zone9-layout-preset',e.target.value);applyHudSettings();restoreHudLayout();});
   $('editHudBtn').addEventListener('click',()=>setLayoutEditing(!layoutEditing));
+  $('layoutDoneBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);});
   $('saveHudBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);$('saveHudBtn').textContent='Сохранено ✓';});
   $('resetHudBtn').addEventListener('click',()=>{localStorage.removeItem('zone9-hud-layout');localStorage.removeItem('zone9-layout-preset');localStorage.setItem('zone9-hud-scale','100');localStorage.setItem('zone9-hud-opacity','88');localStorage.setItem('zone9-hud-visible','all');localStorage.setItem('zone9-crosshair','cross');$('layoutPresetSelect').value='standard';applyHudSettings();restoreHudLayout();setLayoutEditing(false);});
   $('sensitivityRange').addEventListener('input',e=>{localStorage.setItem('zone9-sensitivity',e.target.value);applySensitivity();});
@@ -548,7 +565,7 @@ function loadMapSource(url, displayName, revokeUrl){
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
       const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
       camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
-      hasMap=true; matchSecondsElapsed=0; document.body.classList.add('in-match'); document.body.classList.remove('hud-disabled','hud-minimal','layout-edit'); pauseOpen=false; $('pauseOverlay').classList.remove('visible'); applyHudSettings(); restoreHudLayout(); updateTeamUi(); $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
+      hasMap=true; matchSecondsElapsed=0; document.body.classList.add('in-match'); document.body.classList.remove('hud-disabled','hud-minimal','layout-edit'); pauseOpen=false; $('pauseOverlay').classList.remove('visible'); $('panel').classList.add('hidden'); $('showPanel').classList.remove('visible'); applyHudSettings(); restoreHudLayout(); updateTeamUi(); $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
       $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
       console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
     }catch(err){
@@ -733,7 +750,7 @@ function animate(now=performance.now()){
   requestAnimationFrame(animate);
   const dt=Math.min((now-lastFrame)/1000,0.05); lastFrame=now;
   movePlayer(dt);
-  if(hasMap&&!pauseOpen&&!document.body.classList.contains('pause-open')){matchSecondsElapsed+=dt;updateHudClock();}
+  if(hasMap&&!pauseOpen&&!layoutEditing&&!document.body.classList.contains('pause-open')){matchSecondsElapsed+=dt;updateHudClock();}
   if(hasMap && now-fpsLast>300){ $('fps').textContent=Math.round(fpsFrames*1000/(now-fpsLast)); fpsFrames=0; fpsLast=now; refreshCoordFields(); }
   fpsFrames++;
   renderer.render(scene,camera);
