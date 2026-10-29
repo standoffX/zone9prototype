@@ -308,6 +308,163 @@ function init(){
   initMatchUi();
   animate();
 }
+
+function initMatchUi(){
+  $('hudPauseBtn').addEventListener('click',showPause);
+  $('pauseCloseBtn').addEventListener('click',resumeMatch);
+  $('resumeMatchBtn').addEventListener('click',resumeMatch);
+  $('openSettingsBtn').addEventListener('click',()=>openPauseSettings('hud'));
+  $('layoutModeBtn').addEventListener('click',()=>{openPauseSettings('hud');setLayoutEditing(true);});
+  $('settingsBackBtn').addEventListener('click',()=>{$('pauseSettings').classList.remove('visible');$('pauseHome').classList.remove('hidden');});
+  $('backToLobbyBtn').addEventListener('click',returnToLobby);
+  $('hudScaleRange').addEventListener('input',e=>{localStorage.setItem('zone9-hud-scale',e.target.value);applyHudSettings();});
+  $('hudOpacityRange').addEventListener('input',e=>{localStorage.setItem('zone9-hud-opacity',e.target.value);applyHudSettings();});
+  $('hudVisibleSelect').addEventListener('change',e=>{localStorage.setItem('zone9-hud-visible',e.target.value);applyHudSettings();});
+  $('crosshairSelect').addEventListener('change',e=>{localStorage.setItem('zone9-crosshair',e.target.value);applyHudSettings();});
+  $('layoutPresetSelect').addEventListener('change',e=>{localStorage.setItem('zone9-layout-preset',e.target.value);applyHudSettings();restoreHudLayout();});
+  $('editHudBtn').addEventListener('click',()=>setLayoutEditing(!layoutEditing));
+  $('saveHudBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);$('saveHudBtn').textContent='Сохранено ✓';});
+  $('resetHudBtn').addEventListener('click',()=>{localStorage.removeItem('zone9-hud-layout');localStorage.removeItem('zone9-layout-preset');localStorage.setItem('zone9-hud-scale','100');localStorage.setItem('zone9-hud-opacity','88');localStorage.setItem('zone9-hud-visible','all');localStorage.setItem('zone9-crosshair','cross');$('layoutPresetSelect').value='standard';applyHudSettings();restoreHudLayout();setLayoutEditing(false);});
+  $('sensitivityRange').addEventListener('input',e=>{localStorage.setItem('zone9-sensitivity',e.target.value);applySensitivity();});
+  $('matchGraphicsSelect').addEventListener('change',e=>{localStorage.setItem('zone9-match-graphics',e.target.value);applyGraphicsSetting();});
+  document.querySelectorAll('.settings-tab').forEach(btn=>btn.addEventListener('click',()=>selectSettingsTab(btn.dataset.settingsTab)));
+  document.querySelectorAll('.team-choice').forEach(btn=>btn.addEventListener('click',()=>setPlayerTeam(btn.dataset.team)));
+  installHudDragging();installTouchButtons();
+  $('hudScaleRange').value=localStorage.getItem('zone9-hud-scale')||'100';
+  $('hudOpacityRange').value=localStorage.getItem('zone9-hud-opacity')||'88';
+  $('hudVisibleSelect').value=localStorage.getItem('zone9-hud-visible')||'all';
+  $('crosshairSelect').value=localStorage.getItem('zone9-crosshair')||'cross';
+  $('layoutPresetSelect').value=localStorage.getItem('zone9-layout-preset')||'standard';
+  $('sensitivityRange').value=localStorage.getItem('zone9-sensitivity')||'1';
+  $('matchGraphicsSelect').value=localStorage.getItem('zone9-match-graphics')||'low';
+  applyHudSettings();applySensitivity();applyGraphicsSetting();updateTeamUi();
+}
+function showPause(){
+  if(!hasMap)return;
+  pauseOpen=true;keys.clear();document.body.classList.add('pause-open');
+  $('pauseSettings').classList.remove('visible');$('pauseHome').classList.remove('hidden');
+  $('pauseOverlay').classList.add('visible');
+  if(controls?.isLocked)controls.unlock();
+}
+function resumeMatch(){
+  if(!hasMap){$('pauseOverlay').classList.remove('visible');return;}
+  pauseOpen=false;document.body.classList.remove('pause-open','layout-edit');
+  $('pauseOverlay').classList.remove('visible');layoutEditing=false;
+  if(controls&&!controls.isLocked)controls.lock();
+}
+function returnToLobby(){
+  returningToMenu=true;pauseOpen=false;layoutEditing=false;keys.clear();
+  document.body.classList.remove('in-match','pause-open','layout-edit','hud-disabled','hud-minimal');
+  $('pauseOverlay').classList.remove('visible');$('panel').classList.add('hidden');$('showPanel').classList.remove('visible');
+  if(controls?.isLocked)controls.unlock();
+  $('loader').classList.remove('off');
+  returningToMenu=false;
+}
+function openPauseSettings(tab='hud'){
+  $('pauseHome').classList.add('hidden');$('pauseSettings').classList.add('visible');selectSettingsTab(tab);
+}
+function selectSettingsTab(tab){
+  document.querySelectorAll('.settings-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.settingsTab===tab));
+  $('settingsHudPane').classList.toggle('hidden',tab!=='hud');
+  $('settingsControlsPane').classList.toggle('hidden',tab!=='controls');
+  $('settingsGamePane').classList.toggle('hidden',tab!=='game');
+}
+function setPlayerTeam(team){
+  currentTeam=team==='T'?'T':'CT';localStorage.setItem('zone9-team',currentTeam);updateTeamUi();
+}
+function updateTeamUi(){
+  document.querySelectorAll('.team-choice').forEach(btn=>btn.classList.toggle('selected',btn.dataset.team===currentTeam));
+  $('settingsTeamName').textContent=currentTeam;
+  $('leftTeamName').textContent=currentTeam==='CT'?'CT':'T';
+  $('rightTeamName').textContent=currentTeam==='CT'?'T':'CT';
+  $('ctScore').textContent='0';$('tScore').textContent='0';
+}
+function applyHudSettings(){
+  const scale=Number(localStorage.getItem('zone9-hud-scale')||100),opacity=Number(localStorage.getItem('zone9-hud-opacity')||88);
+  const visible=localStorage.getItem('zone9-hud-visible')||'all',cross=localStorage.getItem('zone9-crosshair')||'cross';
+  const preset=localStorage.getItem('zone9-layout-preset')||'standard';
+  document.documentElement.style.setProperty('--match-hud-scale',String((preset==='compact'?.82:1)*scale/100));
+  document.documentElement.style.setProperty('--match-hud-opacity',String(Math.max(.3,Math.min(1,opacity/100))));
+  $('hudScaleOut').textContent=scale+'%';$('hudOpacityOut').textContent=opacity+'%';
+  document.body.classList.toggle('hud-disabled',visible==='hidden');document.body.classList.toggle('hud-minimal',visible==='minimal');
+  $('hudCrosshair').style.display=cross==='none'?'none':'block';$('hudCrosshair').classList.toggle('dot-only',cross==='dot');
+  document.body.classList.toggle('hud-left-handed',preset==='left');document.body.classList.toggle('hud-compact',preset==='compact');
+  $('hudScaleRange').value=String(scale);$('hudOpacityRange').value=String(opacity);
+  $('hudVisibleSelect').value=visible;$('crosshairSelect').value=cross;$('layoutPresetSelect').value=preset;
+}
+function applySensitivity(){
+  const n=Number(localStorage.getItem('zone9-sensitivity')||1);
+  if(controls)controls.pointerSpeed=n;
+  $('sensitivityRange').value=String(n);$('sensitivityOut').textContent=n.toFixed(1)+'×';
+}
+function applyGraphicsSetting(){
+  if(!renderer)return;
+  const setting=localStorage.getItem('zone9-match-graphics')||'low',dpr=window.devicePixelRatio||1;
+  renderer.setPixelRatio(setting==='high'?Math.min(dpr,1.5):setting==='balanced'?Math.min(dpr,1.15):1);
+  renderer.setSize(innerWidth,innerHeight);
+}
+function setLayoutEditing(on){
+  layoutEditing=!!on;document.body.classList.toggle('layout-edit',layoutEditing);
+  $('editHudBtn').classList.toggle('active',layoutEditing);
+  $('editHudBtn').textContent=layoutEditing?'Готово':'Перемещать элементы';
+  if(layoutEditing){$('pauseOverlay').classList.remove('visible');pauseOpen=false;document.body.classList.remove('pause-open');}
+  else if(hasMap&&!$('pauseOverlay').classList.contains('visible'))showPause();
+}
+function installHudDragging(){
+  let drag=null;
+  document.addEventListener('pointerdown',e=>{
+    if(!layoutEditing)return;
+    const el=e.target.closest('[data-layout-item]');if(!el)return;
+    drag={el,id:e.pointerId,dx:e.clientX-el.getBoundingClientRect().left,dy:e.clientY-el.getBoundingClientRect().top};
+    e.preventDefault();
+  });
+  document.addEventListener('pointermove',e=>{
+    if(!drag||e.pointerId!==drag.id)return;
+    const el=drag.el,x=Math.max(0,Math.min(innerWidth-el.offsetWidth,e.clientX-drag.dx)),y=Math.max(0,Math.min(innerHeight-el.offsetHeight,e.clientY-drag.dy));
+    el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';el.style.bottom='auto';
+    if(el.id==='scoreWidget')el.style.transform='scale(var(--match-hud-scale))';
+  });
+  document.addEventListener('pointerup',e=>{if(drag&&e.pointerId===drag.id)drag=null;});
+  document.addEventListener('pointercancel',()=>{drag=null;});
+}
+function saveHudLayout(){
+  const layout={};
+  document.querySelectorAll('[data-layout-item]').forEach(el=>{if(el.style.left&&el.style.top)layout[el.dataset.layoutItem]={left:el.style.left,top:el.style.top};});
+  localStorage.setItem('zone9-hud-layout',JSON.stringify(layout));
+}
+function restoreHudLayout(){
+  document.querySelectorAll('[data-layout-item]').forEach(el=>{el.style.left='';el.style.top='';el.style.right='';el.style.bottom='';el.style.transform='';});
+  const preset=localStorage.getItem('zone9-layout-preset')||'standard';
+  const touchLeft=$('touchControls').querySelector('.touch-left'),touchRight=$('touchControls').querySelector('.touch-right');
+  if(preset==='left'){
+    $('vitalsWidget').style.left='auto';$('vitalsWidget').style.right='18px';
+    $('ammoWidget').style.right='auto';$('ammoWidget').style.left='18px';
+    touchLeft.style.left='auto';touchLeft.style.right='16px';touchRight.style.right='auto';touchRight.style.left='16px';
+  }else{
+    touchLeft.style.right='';touchLeft.style.left='';touchRight.style.left='';touchRight.style.right='';
+  }
+  try{
+    const layout=JSON.parse(localStorage.getItem('zone9-hud-layout')||'{}');
+    document.querySelectorAll('[data-layout-item]').forEach(el=>{const p=layout[el.dataset.layoutItem];if(p&&p.left&&p.top){el.style.left=p.left;el.style.top=p.top;el.style.right='auto';el.style.bottom='auto';if(el.id==='scoreWidget')el.style.transform='scale(var(--match-hud-scale))';}});
+  }catch(e){console.warn('Could not restore HUD layout',e);}
+}
+function installTouchButtons(){
+  document.querySelectorAll('#touchControls [data-key]').forEach(btn=>{
+    const code=btn.dataset.key,release=()=>keys.delete(code);
+    btn.addEventListener('pointerdown',e=>{e.preventDefault();keys.add(code);});
+    ['pointerup','pointercancel','pointerleave','lostpointercapture'].forEach(name=>btn.addEventListener(name,release));
+  });
+  document.querySelectorAll('#touchControls [data-action]').forEach(btn=>btn.addEventListener('click',e=>{
+    e.preventDefault();const a=btn.dataset.action;
+    if(a==='jump'&&isGrounded&&!noclipEnabled)jumpQueued=true;
+    else if(['fire','reload','crouch'].includes(a))btn.classList.toggle('active');
+  }));
+}
+function updateHudClock(){
+  const remaining=Math.max(0,90-Math.floor(matchSecondsElapsed));
+  $('roundClock').textContent=String(Math.floor(remaining/60)).padStart(2,'0')+':'+String(remaining%60).padStart(2,'0');
+}
+
 function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
 function onKeyDown(e){
   if(e.code==='Escape'&&!e.repeat){e.preventDefault();if(hasMap){if(pauseOpen)resumeMatch();else showPause();}return;}
