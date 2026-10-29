@@ -211,6 +211,7 @@ const generatedLampLights = [];
 let floorY = 0, playerScale = 1, hasMap = false, lastFrame = performance.now(), fpsFrames = 0, fpsLast = performance.now();
 let verticalVelocity = 0, isGrounded = true, jumpQueued = false, noclipEnabled = false;
 let selectedMapKey = 'zone9', selectedMode = 'team_fight';
+let pauseOpen=false, returningToMenu=false, layoutEditing=false, currentTeam=localStorage.getItem('zone9-team')||'CT', matchSecondsElapsed=0;
 const MAP_OPTIONS = { zone9: {label:'Zone 9', file:'https://raw.githubusercontent.com/standoffX/zone9prototype/main/zone9.glb'} };
 const keys = new Set();
 const raycaster = new THREE.Raycaster();
@@ -254,7 +255,7 @@ function init(){
   const sun = new THREE.DirectionalLight(0xffffff, 2.0); sun.position.set(80,140,60); scene.add(sun);
   mapRoot = new THREE.Group(); scene.add(mapRoot);
   controls.addEventListener('lock', () => document.body.classList.add('locked'));
-  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); });
+  controls.addEventListener('unlock', () => { document.body.classList.remove('locked'); keys.clear(); if(hasMap&&!returningToMenu&&!pauseOpen) showPause(); });
   renderer.domElement.addEventListener('click', () => { if(hasMap && !controls.isLocked && !isUiFocused()) controls.lock(); });
   window.addEventListener('resize', onResize);
   window.addEventListener('keydown', onKeyDown);
@@ -304,10 +305,12 @@ function init(){
   $('noclipBtn').addEventListener('click',toggleNoclip);
   $('speedRange').addEventListener('input',e=>{speedMultiplier=Number(e.target.value);$('speedValue').textContent=speedMultiplier.toFixed(1)+'×';});
   $('showPanel').addEventListener('click', togglePanel);
+  initMatchUi();
   animate();
 }
 function isUiFocused(){ const el=document.activeElement; return el && (el.tagName==='INPUT'||el.tagName==='BUTTON'||el.tagName==='TEXTAREA'||el.tagName==='SELECT'); }
 function onKeyDown(e){
+  if(e.code==='Escape'&&!e.repeat){e.preventDefault();if(hasMap){if(pauseOpen)resumeMatch();else showPause();}return;}
   if(e.code==='KeyG'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();togglePanel();return;}
   if(e.code==='KeyN'&&!e.repeat&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){e.preventDefault();toggleNoclip();return;}
   if(e.code==='Space'&&!e.repeat){e.preventDefault();if(noclipEnabled)keys.add(e.code);else if(controls?.isLocked&&isGrounded)jumpQueued=true;return;}
@@ -388,7 +391,7 @@ function loadMapSource(url, displayName, revokeUrl){
       const dx = center.x - spawn.x, dz = center.z - spawn.z;
       const yaw = Math.hypot(dx,dz) > 3 ? Math.atan2(-dx,-dz) : 0;
       camera.rotation.order='YXZ'; camera.rotation.set(-0.035,yaw,0);
-      hasMap=true; $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
+      hasMap=true; matchSecondsElapsed=0; document.body.classList.add('in-match'); document.body.classList.remove('hud-disabled','hud-minimal','layout-edit'); pauseOpen=false; $('pauseOverlay').classList.remove('visible'); applyHudSettings(); restoreHudLayout(); updateTeamUi(); $('activeMapTag').textContent=displayName.replace(/\.glb$/i,'').replace(/[_-]+/g,' ').toUpperCase(); loaderScreen.classList.add('off'); refreshCoordFields(true);
       $('quality').textContent=mapScaleFactor===1?'GLB':'×'+mapScaleFactor;
       console.info('[Zone 9] map bounds', mapBounds.min.toArray(), mapBounds.max.toArray(), 'auto scale', mapScaleFactor, 'spawn', spawn);
     }catch(err){
@@ -573,6 +576,7 @@ function animate(now=performance.now()){
   requestAnimationFrame(animate);
   const dt=Math.min((now-lastFrame)/1000,0.05); lastFrame=now;
   movePlayer(dt);
+  if(hasMap&&!pauseOpen&&!document.body.classList.contains('pause-open')){matchSecondsElapsed+=dt;updateHudClock();}
   if(hasMap && now-fpsLast>300){ $('fps').textContent=Math.round(fpsFrames*1000/(now-fpsLast)); fpsFrames=0; fpsLast=now; refreshCoordFields(); }
   fpsFrames++;
   renderer.render(scene,camera);
