@@ -288,7 +288,7 @@ function init(){
   renderer.domElement.addEventListener('click', () => { if(hasMap && !controls.isLocked && !isUiFocused() && matchMedia('(pointer:fine)').matches) controls.lock(); });
   let touchLook=null;
   renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&hasMap){touchLook={id:e.pointerId,x:e.clientX,y:e.clientY};}});
-  window.addEventListener('pointermove',e=>{if(!touchLook||e.pointerId!==touchLook.id||!hasMap||pauseOpen)return;const dx=e.clientX-touchLook.x,dy=e.clientY-touchLook.y;touchLook.x=e.clientX;touchLook.y=e.clientY;camera.rotation.order='YXZ';camera.rotation.y-=dx*.004*(controls?.pointerSpeed||1);camera.rotation.x-=dy*.004*(controls?.pointerSpeed||1);camera.rotation.x=Math.max(-1.48,Math.min(1.48,camera.rotation.x));});
+  window.addEventListener('pointermove',e=>{if(!touchLook||e.pointerId!==touchLook.id||!hasMap||pauseOpen||layoutEditing)return;const dx=e.clientX-touchLook.x,dy=e.clientY-touchLook.y;touchLook.x=e.clientX;touchLook.y=e.clientY;camera.rotation.order='YXZ';camera.rotation.y-=dx*.004*(controls?.pointerSpeed||1);camera.rotation.x-=dy*.004*(controls?.pointerSpeed||1);camera.rotation.x=Math.max(-1.48,Math.min(1.48,camera.rotation.x));});
   window.addEventListener('pointerup',e=>{if(touchLook&&e.pointerId===touchLook.id)touchLook=null;});
   window.addEventListener('pointercancel',()=>{touchLook=null;});
   window.addEventListener('resize', onResize);
@@ -344,7 +344,7 @@ function init(){
 }
 
 function initMatchUi(){
-  $('hudPauseBtn').addEventListener('click',showPause);
+  $('hudPauseBtn').addEventListener('click',()=>{if(!layoutEditing)showPause();});
   $('pauseCloseBtn').addEventListener('click',resumeMatch);
   $('resumeMatchBtn').addEventListener('click',resumeMatch);
   $('openSettingsBtn').addEventListener('click',()=>openPauseSettings('hud'));
