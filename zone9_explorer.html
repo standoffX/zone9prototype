@@ -102,6 +102,7 @@ body.hud-left-handed #ammoWidget{right:auto;left:18px}
 body.hud-left-handed .touch-left{left:auto;right:16px}
 body.hud-left-handed .touch-right{right:auto;left:16px}
 body.hud-compact .hud-widget{border-radius:6px}
+.hud-pause,.hud-ammo{transform-origin:top right}.hud-vitals{transform-origin:bottom left}
 #layoutDoneBtn{display:none;position:fixed;z-index:50;left:50%;bottom:18px;transform:translateX(-50%);gap:10px;align-items:center;justify-content:center;padding:13px 22px;border:1px solid #ffffff35;border-radius:9px;background:#24292f;color:#eef1f4;font-size:12px;font-weight:950;box-shadow:0 8px 28px #0008;cursor:pointer}
 #layoutDoneBtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 body.layout-edit #layoutDoneBtn{display:flex}
@@ -250,13 +251,13 @@ en:{
 }};
 
 Object.assign(I18N.uk,{
-"ПАУЗА":"ПАУЗА","Продолжить матч":"Продовжити матч","Вернуться в игру":"Повернутися до гри","Настройки":"Налаштування","HUD и управление":"HUD та керування","Раскладка HUD":"Розкладка HUD","Переместить элементы":"Перемістити елементи","КОМАНДА":"КОМАНДА","Спецназ · CT":"Спецпризначенці · CT","Защитники":"Захисники","Террористы · T":"Терористи · T","Атакующие":"Атакувальники","Выйти в меню":"Вийти в меню","Управление":"Керування","Игра":"Гра","Размер интерфейса":"Розмір інтерфейсу","Прозрачность":"Прозорість","Отображение HUD":"Відображення HUD","Всё":"Усе","Минимум":"Мінімум","Скрыть":"Приховати","Прицел":"Приціл","Крест":"Хрест","Точка":"Точка","Набор раскладки":"Набір розкладки","Стандартная":"Стандартна","Левша":"Для шульги","Компактная":"Компактна","Перемещать элементы":"Переміщати елементи","Сохранить раскладку":"Зберегти розкладку","Сбросить":"Скинути","Движение":"Рух","Прыжок":"Стрибок","Бег":"Біг","Чувствительность":"Чутливість","Сторона":"Сторона","Низкое":"Низька","Среднее":"Середня","Высокое":"Висока","Сохранить и выйти":"Зберегти й вийти","Язык":"Мова","Вернуться в игру":"Повернутися до гри","Назад":"Назад","Мышь":"Миша","ВЫБОР РЕЖИМА":"ВИБІР РЕЖИМУ","Управление":"Керування"
+"HP":"ЗД","ARMOR":"БРОНЯ","ПАУЗА":"ПАУЗА","Продолжить матч":"Продовжити матч","Вернуться в игру":"Повернутися до гри","Настройки":"Налаштування","HUD и управление":"HUD та керування","Раскладка HUD":"Розкладка HUD","Переместить элементы":"Перемістити елементи","КОМАНДА":"КОМАНДА","Спецназ · CT":"Спецпризначенці · CT","Защитники":"Захисники","Террористы · T":"Терористи · T","Атакующие":"Атакувальники","Выйти в меню":"Вийти в меню","Управление":"Керування","Игра":"Гра","Размер интерфейса":"Розмір інтерфейсу","Прозрачность":"Прозорість","Отображение HUD":"Відображення HUD","Всё":"Усе","Минимум":"Мінімум","Скрыть":"Приховати","Прицел":"Приціл","Крест":"Хрест","Точка":"Точка","Набор раскладки":"Набір розкладки","Стандартная":"Стандартна","Левша":"Для шульги","Компактная":"Компактна","Перемещать элементы":"Переміщати елементи","Сохранить раскладку":"Зберегти розкладку","Сбросить":"Скинути","Движение":"Рух","Прыжок":"Стрибок","Бег":"Біг","Чувствительность":"Чутливість","Сторона":"Сторона","Низкое":"Низька","Среднее":"Середня","Высокое":"Висока","Сохранить и выйти":"Зберегти й вийти","Готово":"Готово","Язык":"Мова","Вернуться в игру":"Повернутися до гри","Назад":"Назад","Мышь":"Миша","ВЫБОР РЕЖИМА":"ВИБІР РЕЖИМУ","Управление":"Керування"
 });
 Object.assign(I18N.ru,{
 "Continue match":"Продолжить матч","Resume match":"Продолжить матч","HUD & controls":"HUD и управление","Leave match":"Выйти в меню","Save layout":"Сохранить раскладку","Move HUD elements":"Перемещать элементы"
 });
 Object.assign(I18N.en,{
-"ПАУЗА":"PAUSE","Продолжить матч":"Resume match","Вернуться в игру":"Return to game","Настройки":"Settings","HUD и управление":"HUD & Controls","Раскладка HUD":"HUD Layout","Переместить элементы":"Move HUD elements","КОМАНДА":"TEAM","Спецназ · CT":"Counter-Terrorists · CT","Защитники":"Defenders","Террористы · T":"Terrorists · T","Атакующие":"Attackers","Выйти в меню":"Leave match","Управление":"Controls","Игра":"Game","Размер интерфейса":"HUD scale","Прозрачность":"Opacity","Отображение HUD":"HUD visibility","Всё":"All","Минимум":"Minimal","Скрыть":"Hide","Прицел":"Crosshair","Крест":"Cross","Точка":"Dot","Набор раскладки":"Layout preset","Стандартная":"Standard","Левша":"Left-handed","Компактная":"Compact","Перемещать элементы":"Move elements","Сохранить раскладку":"Save layout","Сбросить":"Reset","Движение":"Movement","Прыжок":"Jump","Бег":"Sprint","Чувствительность":"Sensitivity","Сторона":"Team","Низкое":"Low","Среднее":"Medium","Высокое":"High","Сохранить и выйти":"Save and exit","Язык":"Language","Назад":"Back","Мышь":"Mouse","ZONE 9 · MATCH":"ZONE 9 · MATCH"
+"HP":"HP","ARMOR":"ARMOR","БРОНЯ":"ARMOR","ЗД":"HP","ПАУЗА":"PAUSE","Продолжить матч":"Resume match","Вернуться в игру":"Return to game","Настройки":"Settings","HUD и управление":"HUD & Controls","Раскладка HUD":"HUD Layout","Переместить элементы":"Move HUD elements","КОМАНДА":"TEAM","Спецназ · CT":"Counter-Terrorists · CT","Защитники":"Defenders","Террористы · T":"Terrorists · T","Атакующие":"Attackers","Выйти в меню":"Leave match","Управление":"Controls","Игра":"Game","Размер интерфейса":"HUD scale","Прозрачность":"Opacity","Отображение HUD":"HUD visibility","Всё":"All","Минимум":"Minimal","Скрыть":"Hide","Прицел":"Crosshair","Крест":"Cross","Точка":"Dot","Набор раскладки":"Layout preset","Стандартная":"Standard","Левша":"Left-handed","Компактная":"Compact","Перемещать элементы":"Move elements","Сохранить раскладку":"Save layout","Сбросить":"Reset","Движение":"Movement","Прыжок":"Jump","Бег":"Sprint","Чувствительность":"Sensitivity","Сторона":"Team","Низкое":"Low","Среднее":"Medium","Высокое":"High","Сохранить и выйти":"Save and exit","Готово":"Done","Язык":"Language","Назад":"Back","Мышь":"Mouse","ZONE 9 · MATCH":"ZONE 9 · MATCH"
 });
 
 const originalTextNodes=new WeakMap();
@@ -358,7 +359,7 @@ function initMatchUi(){
   $('layoutPresetSelect').addEventListener('change',e=>{localStorage.setItem('zone9-layout-preset',e.target.value);applyHudSettings();restoreHudLayout();});
   $('editHudBtn').addEventListener('click',()=>setLayoutEditing(!layoutEditing));
   $('layoutDoneBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);});
-  $('saveHudBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);$('saveHudBtn').textContent='Сохранено ✓';});
+  $('saveHudBtn').addEventListener('click',()=>{saveHudLayout();setLayoutEditing(false);$('saveHudBtn').textContent=tr('Сохранить раскладку')+' ✓';});
   $('resetHudBtn').addEventListener('click',()=>{localStorage.removeItem('zone9-hud-layout');localStorage.removeItem('zone9-layout-preset');localStorage.setItem('zone9-hud-scale','100');localStorage.setItem('zone9-hud-opacity','88');localStorage.setItem('zone9-hud-visible','all');localStorage.setItem('zone9-crosshair','cross');$('layoutPresetSelect').value='standard';applyHudSettings();restoreHudLayout();setLayoutEditing(false);});
   $('sensitivityRange').addEventListener('input',e=>{localStorage.setItem('zone9-sensitivity',e.target.value);applySensitivity();});
   $('matchGraphicsSelect').addEventListener('change',e=>{localStorage.setItem('zone9-match-graphics',e.target.value);applyGraphicsSetting();});
@@ -443,7 +444,7 @@ function applyGraphicsSetting(){
 function setLayoutEditing(on){
   layoutEditing=!!on;document.body.classList.toggle('layout-edit',layoutEditing);
   $('editHudBtn').classList.toggle('active',layoutEditing);
-  $('editHudBtn').textContent=layoutEditing?'Готово':'Перемещать элементы';
+  $('editHudBtn').textContent=layoutEditing?tr('Готово'):tr('Перемещать элементы');
   if(layoutEditing){$('pauseOverlay').classList.remove('visible');pauseOpen=false;document.body.classList.remove('pause-open');}
   else if(hasMap&&!$('pauseOverlay').classList.contains('visible'))showPause();
 }
